@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ollama Moderation Gateway — OpenAI 兼容内容审核网关</title>
-  <meta name="description" content="基于 Ollama（云端或自托管）的 OpenAI 兼容 Moderations API 网关。多 Key 池、FastAPI、Docker、失败闭锁。启发式评分，不等同于 OpenAI omni-moderation。可对接 sub2api 内容审计。" />
+  <title>Ollama Moderation Gateway — 免费 AI 内容审核</title>
+  <meta name="description" content="免费的 Ollama AI 内容审核 / 审计。兼容 OpenAI Moderations，可直接对接 sub2api。多 Key 轮换、轻量、即插即用。质量不等同于 OpenAI 官方审核。" />
   <meta name="theme-color" content="#0b1220" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,11 +25,10 @@
         Ollama Moderation Gateway
       </a>
       <nav class="nav-links" aria-label="主导航">
-        <a class="hide-sm" href="#features">能力</a>
-        <a class="hide-sm" href="#how">原理</a>
-        <a class="hide-sm" href="#code">上手</a>
-        <a class="hide-sm" href="#integrations">集成</a>
-        <a class="hide-sm" href="#disclaimer">免责声明</a>
+        <a class="hide-sm" href="#features">为什么用</a>
+        <a class="hide-sm" href="#integrations">对接 sub2api</a>
+        <a class="hide-sm" href="#code">快速上手</a>
+        <a class="hide-sm" href="#disclaimer">说明</a>
         <a href="https://github.com/AaronYang0628/ollama-moderation-gateway">GitHub</a>
         <span class="lang-switch" aria-label="语言">
           <a href="../">EN</a>
@@ -45,18 +44,17 @@
     <section class="hero">
       <div class="wrap hero-grid">
         <div>
-          <div class="eyebrow">OpenAI 兼容 · Ollama 后端 · Apache-2.0</div>
-          <h1>用你已经熟悉的 Moderations 接口，跑自己的内容审核</h1>
+          <div class="eyebrow">免费 · Ollama AI · 兼容 OpenAI Moderations</div>
+          <h1>免费的 AI 内容审核，即插即用</h1>
           <p class="hero-lead">
-            基于 FastAPI 的网关，对外提供 <code class="inline">POST /v1/moderations</code>，
-            将打分路由到 Ollama Cloud 或自托管模型，并在上游异常时保持
-            <strong>失败闭锁（fail-closed）</strong>。
+            用 Ollama（云端或自建）做内容审计 / 审核，对外仍是熟悉的
+            <code class="inline">/v1/moderations</code> 接口。
+            轻量、支持多 Key 轮换，尤其适合对接
+            <strong>sub2api</strong>。
           </p>
           <p class="zh-summary">
-            <strong>一句话：</strong>OpenAI 风格的内容审核 API + Ollama 推理。
-            通用对话模型做启发式风险评分，<strong>不等同于</strong> OpenAI
-            <code class="inline">omni-moderation</code>。支持多 Key 池、Docker；
-            上游失败时<strong>不会</strong>伪造 <code class="inline">flagged=false</code>。
+            <strong>一句话：</strong>免费 Ollama AI 内容审核 · 兼容 OpenAI Moderations · 可直接接 sub2api ·
+            轻量多 Key 轮换 · 质量<strong>不等同于</strong> OpenAI 官方审核模型。
           </p>
           <div class="cta-row">
             <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">查看 GitHub</a>
@@ -64,17 +62,17 @@
             <a class="btn btn-ghost" href="https://ollama-moderation-gateway.onrender.com">试用演示</a>
           </div>
           <div class="meta-row">
-            <span class="chip">多 Key 池</span>
-            <span class="chip">Docker / Compose</span>
-            <span class="chip">策略 YAML</span>
-            <span class="chip">启发式评分</span>
+            <span class="chip">免费 Ollama 审核</span>
+            <span class="chip">多 Key 轮换</span>
+            <span class="chip">轻量</span>
+            <span class="chip">对接 sub2api</span>
           </div>
         </div>
         <aside class="hero-card" aria-label="示例请求">
           <div class="hero-card-top">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           </div>
-          <pre><span class="tok-cm"># OpenAI SDK → 本网关</span>
+          <pre><span class="tok-cm"># 同一套 OpenAI Moderations 调用 → 本服务</span>
 <span class="tok-key">from</span> openai <span class="tok-key">import</span> OpenAI
 
 client = OpenAI(
@@ -93,70 +91,139 @@ print(result.results[0].flagged)</pre>
 
     <section id="features">
       <div class="wrap">
-        <h2 class="section-title">为需要掌控感的运维与开发者而建</h2>
+        <h2 class="section-title">为什么用它</h2>
         <p class="section-lead">
-          保留 Moderations 客户端约定，自行选择推理落点。
-          轮换密钥、调节阈值、用 Docker 交付。
+          少付一笔 OpenAI Moderations 费用，保留你已有的客户端。
+          几分钟加上免费的 Ollama 内容审核。
         </p>
         <div class="grid-3">
           <article class="card">
-            <div class="icon" aria-hidden="true">⇄</div>
-            <h3>即插即用接口</h3>
-            <p><code class="inline">/v1/moderations</code>、<code class="inline">/v1/models</code>、健康与就绪检查 — OpenAI 风格错误与响应。</p>
+            <div class="icon" aria-hidden="true">✦</div>
+            <h3>免费 AI 内容审核</h3>
+            <p>用 Ollama Cloud 或自建模型做日常内容审计，不必为 Moderations 接口单独付 OpenAI 账单。</p>
           </article>
           <article class="card">
-            <div class="icon" aria-hidden="true">☁</div>
-            <h3>云端或自托管</h3>
-            <p>默认对接 Ollama Cloud（<code class="inline">ollama.com</code>）。需要隔离环境时，将 <code class="inline">OLLAMA_BASE_URL</code> 指向私有主机即可。</p>
+            <div class="icon" aria-hidden="true">⇄</div>
+            <h3>兼容 OpenAI Moderations</h3>
+            <p>同一套 <code class="inline">POST /v1/moderations</code>。OpenAI SDK、sub2api、或任意 Moderations 客户端，改个地址就能用。</p>
           </article>
           <article class="card">
             <div class="icon" aria-hidden="true">⟳</div>
-            <h3>多 Key 池</h3>
-            <p>对 <code class="inline">OLLAMA_API_KEYS</code> 轮询。遇 401 / 403 / 429 / 配额类错误进入冷却，避免单 Key 拖垮流量。</p>
+            <h3>多 Key 轮换</h3>
+            <p>配置多个 Ollama Key，网关自动轮询；遇 401 / 403 / 429 / 配额会冷却坏 Key，流量继续走。</p>
           </article>
           <article class="card">
-            <div class="icon" aria-hidden="true">☰</div>
-            <h3>可编辑策略</h3>
-            <p>按类别配置 YAML 阈值，以及边界附近的 <code class="inline">uncertain_mode</code>：标记、放行或报错。</p>
+            <div class="icon" aria-hidden="true">◈</div>
+            <h3>轻量即插即用</h3>
+            <p>一个小服务搞定。Docker Compose 或本地几步启动，不用重写客户端，也不用上重型平台。</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">☁</div>
+            <h3>云端或自己的机器</h3>
+            <p>默认走 Ollama Cloud；想私有部署，指向本机 Ollama，数据留在你自己的网络里。</p>
           </article>
           <article class="card">
             <div class="icon" aria-hidden="true">⏹</div>
-            <h3>失败闭锁</h3>
-            <p>上游或解析失败返回 502 / 503 / 504。网关<strong>绝不</strong>凭空给出干净的 <code class="inline">flagged=false</code>。</p>
-          </article>
-          <article class="card">
-            <div class="icon" aria-hidden="true">▣</div>
-            <h3>运维向 MVP</h3>
-            <p>FastAPI、Docker Compose、日志脱敏、常量时间 API Key 比较、带 Mock Ollama 的 pytest。</p>
+            <h3>不装「安全」</h3>
+            <p>模型挂了或结果不可用时直接报错，绝不会凭空返回「全部通过」。</p>
           </article>
         </div>
       </div>
     </section>
 
-    <section id="how">
+    <section id="integrations">
       <div class="wrap">
-        <h2 class="section-title">工作原理</h2>
-        <p class="section-lead">一条坦诚的薄管道：通用对话模型 + 结构化 JSON，再套上你的阈值。</p>
+        <h2 class="section-title">几分钟对接 sub2api</h2>
+        <p class="section-lead">
+          最对口的场景：
+          <a href="https://github.com/Wei-Shaw/sub2api" rel="noopener">sub2api</a>
+          的内容审计（风控中心 · 内容审计）本来就支持 OpenAI 风格 Moderations 后端。
+          本服务就是那个后端 —— 界面继续用 sub2api，打分走免费的 Ollama。
+        </p>
+
+        <div class="callout">
+          <strong>改一处就够。</strong>
+          保留 sub2api 的风控界面，把 Moderations 的 Base URL 指到本服务。
+          不用写新客户端、不用换协议 —— 背后换成免费的 Ollama AI 审核。
+        </div>
+
+        <h3 style="margin: 1.75rem 0 0.85rem; font-size: 1.05rem;">快速配置</h3>
         <div class="steps">
           <div class="step">
             <div class="step-num">1</div>
             <div>
-              <h3>客户端调用 Moderations</h3>
-              <p>你的应用（或 OpenAI SDK）向网关发起请求，模型别名例如 <code class="inline">moderation-fast</code>。</p>
+              <h3>Base URL — 不要带尾部 <code class="inline">/v1</code></h3>
+              <p>
+                填
+                <code class="inline">https://ollama-moderation-gateway.onrender.com</code>，
+                <strong>不要</strong>再加 <code class="inline">/v1</code>。
+                sub2api 会自己拼 <code class="inline">/v1/moderations</code>；多写一层路径会 404。
+              </p>
             </div>
           </div>
           <div class="step">
             <div class="step-num">2</div>
             <div>
-              <h3>网关对接 Ollama</h3>
-              <p>原生 <code class="inline">POST /api/chat</code>，配合 JSON Schema 结构化输出。密钥轮换；鉴权/限流失败时进入冷却。</p>
+              <h3>模型</h3>
+              <p>
+                用 <code class="inline">moderation-fast</code>
+                （界面若偏好别名，也可用 <code class="inline">omni-moderation-latest</code>）。
+              </p>
             </div>
           </div>
           <div class="step">
             <div class="step-num">3</div>
             <div>
-              <h3>分数对照策略</h3>
-              <p>启发式类别分数（0–1）与 <code class="inline">configs/policy.yaml</code> 比较。临界情况遵循你配置的 uncertain 模式。</p>
+              <h3>API Key = 网关密钥</h3>
+              <p>
+                填网关的 <code class="inline">MODERATION_API_KEY</code>，
+                <strong>不是</strong> Ollama Cloud 密钥。
+                公开演示站可能需要你自行部署并配置密钥。
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div>
+              <h3>把 <code class="inline">timeout_ms</code> 设为 <code class="inline">30000</code></h3>
+              <p>
+                默认 <code class="inline">3000</code> 对云端模型延迟和免费层冷启动太短。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <p style="margin: 1.25rem 0 0; color: var(--muted); font-size: 0.95rem;">
+          sub2api：
+          <a href="https://github.com/Wei-Shaw/sub2api" rel="noopener">github.com/Wei-Shaw/sub2api</a>
+        </p>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="wrap">
+        <h2 class="section-title">怎么接上</h2>
+        <p class="section-lead">三步搞定，不讲架构课。</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <h3>你的应用调用 Moderations</h3>
+              <p>OpenAI SDK、sub2api、curl —— 凡是会请求 <code class="inline">/v1/moderations</code> 的都行。</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <h3>网关去问 Ollama</h3>
+              <p>Key 自动轮换。你选云端或自建。<code class="inline">moderation-fast</code> 等别名会映射到对应 Ollama 模型。</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <h3>拿到熟悉的结果</h3>
+              <p>OpenAI 风格的 <code class="inline">flagged</code> / 类别 / 分数，直接接进现有风控流程。</p>
             </div>
           </div>
         </div>
@@ -166,8 +233,8 @@ print(result.results[0].flagged)</pre>
           <table>
             <thead>
               <tr>
-                <th>客户端 model</th>
-                <th>Ollama 模型</th>
+                <th>你传入</th>
+                <th>Ollama 实际跑</th>
                 <th>说明</th>
               </tr>
             </thead>
@@ -175,22 +242,22 @@ print(result.results[0].flagged)</pre>
               <tr>
                 <td><code class="inline">moderation-fast</code></td>
                 <td><code class="inline">gpt-oss:20b</code></td>
-                <td>默认路径</td>
+                <td>默认推荐</td>
               </tr>
               <tr>
                 <td><code class="inline">moderation-standard</code></td>
                 <td><code class="inline">gemma4:31b</code></td>
-                <td>更大推理预算</td>
+                <td>更重一点</td>
               </tr>
               <tr>
                 <td><code class="inline">moderation-accurate</code></td>
                 <td><code class="inline">gpt-oss:120b</code></td>
-                <td>最大；自托管需充足资源</td>
+                <td>最大；自托管需要充足硬件</td>
               </tr>
               <tr>
                 <td><code class="inline">omni-moderation-latest</code></td>
                 <td><code class="inline">gpt-oss:20b</code></td>
-                <td>仅兼容别名 — 非 OpenAI 对等</td>
+                <td>仅名称兼容 — 非 OpenAI 质量</td>
               </tr>
             </tbody>
           </table>
@@ -201,10 +268,10 @@ print(result.results[0].flagged)</pre>
     <section id="code">
       <div class="wrap">
         <h2 class="section-title">几分钟跑起来</h2>
-        <p class="section-lead">文档中的密钥仅为本地冒烟占位。切勿提交真实密钥。</p>
+        <p class="section-lead">文档里的密钥只是本地冒烟占位。切勿提交真实密钥。</p>
         <div class="split">
           <div>
-            <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">本地开发</h3>
+            <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">本地</h3>
             <pre class="code-block">git clone https://github.com/AaronYang0628/ollama-moderation-gateway.git
 cd ollama-moderation-gateway
 python -m venv .venv &amp;&amp; source .venv/bin/activate
@@ -225,106 +292,23 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
   }'</pre>
             <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
               演示：<a href="https://ollama-moderation-gateway.onrender.com">onrender.com</a> —
-              免费层可能冷启动较慢；生产请使用自有密钥与部署。
+              免费层可能冷启动；生产请用自有密钥与部署。
             </p>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="integrations">
-      <div class="wrap">
-        <h2 class="section-title">与 sub2api 联调</h2>
-        <p class="section-lead">
-          真实场景：将
-          <a href="https://github.com/Wei-Shaw/sub2api" rel="noopener">sub2api</a>
-          的内容审计（风控中心 · 内容审计）指向本网关，作为 OpenAI 兼容的 Moderations 后端 —
-          同一套 <code class="inline">/v1/moderations</code> 约定，打分走你自己的 Ollama。
-        </p>
-
-        <div class="callout">
-          <strong>为何合适。</strong>
-          sub2api 期望 OpenAI 风格的 moderations Base URL。本网关说同一种方言，
-          因此可保留 sub2api 的风控界面，同时让推理落在 Ollama Cloud 或自有主机 —
-          无需另写客户端。
-        </div>
-
-        <h3 style="margin: 1.75rem 0 0.85rem; font-size: 1.05rem;">已验证的配置要点</h3>
-        <div class="steps">
-          <div class="step">
-            <div class="step-num">1</div>
-            <div>
-              <h3>Base URL — 不要带尾部 <code class="inline">/v1</code></h3>
-              <p>
-                Base URL 请填
-                <code class="inline">https://ollama-moderation-gateway.onrender.com</code>，
-                <strong>不要</strong>追加 <code class="inline">/v1</code>。
-                sub2api 会自行拼接 <code class="inline">/v1/moderations</code>；
-                若再带 <code class="inline">/v1</code> 会变成 <code class="inline">/v1/v1/...</code>，
-                返回 <code class="inline">{"detail":"Not Found"}</code>。
-              </p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">2</div>
-            <div>
-              <h3>模型</h3>
-              <p>
-                使用 <code class="inline">moderation-fast</code>
-                （或兼容别名 <code class="inline">omni-moderation-latest</code>）。
-              </p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">3</div>
-            <div>
-              <h3>API Key = 网关密钥</h3>
-              <p>
-                填写网关的 <code class="inline">MODERATION_API_KEY</code>，
-                <strong>不是</strong> Ollama Cloud 密钥。
-                文档占位符为 <code class="inline">your-gateway-api-key</code> —
-                公开演示站可能需要你自行部署并配置密钥。
-              </p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">4</div>
-            <div>
-              <h3>将 <code class="inline">timeout_ms</code> 提到 <code class="inline">30000</code></h3>
-              <p>
-                默认 <code class="inline">3000</code> 对云端 LLM 延迟 + Render 冷启动过短。
-                请将 <code class="inline">timeout_ms</code> 设为 <code class="inline">30000</code>（30 秒）。
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="callout callout-warn" style="margin-top: 1.25rem;">
-          <strong>提醒：</strong>分数来自通用对话模型的启发式风险估计 —
-          <strong>不等同于</strong> OpenAI <code class="inline">omni-moderation-latest</code>。
-          上线前请用自己的流量做评估。
-        </div>
-
-        <p style="margin: 1.25rem 0 0; color: var(--muted); font-size: 0.95rem;">
-          集成参考：
-          <a href="https://github.com/Wei-Shaw/sub2api" rel="noopener">github.com/Wei-Shaw/sub2api</a>。
-          本页仅记录这一组已验证对接，不扩展其他产品列表。
-        </p>
-      </div>
-    </section>
-
     <section id="disclaimer">
       <div class="wrap">
         <div class="disclaimer">
-          <h2>重要：不等同于 OpenAI omni-moderation</h2>
+          <h2>一句实话</h2>
           <p style="margin: 0; color: #f3cfc8;">
-            打分使用<strong>通用对话模型</strong>，不是专用安全分类器。
+            本服务的质量<strong>不等同于</strong> OpenAI 官方审核模型
+            （<code class="inline">omni-moderation-latest</code>）。
+            它用通用 Ollama 对话模型做免费 / 自托管内容审计 —— 省钱、可控，但和专用安全分类器不是一回事。
+            上线前请用自己的流量试一试。
           </p>
-          <ul>
-            <li><code class="inline">category_scores</code> 是启发式风险估计（0–1），不是校准后的概率。</li>
-            <li>质量、分数尺度与行为均不同于 OpenAI <code class="inline">omni-moderation-latest</code>。</li>
-            <li>生产前请按你的语言与风险画像评估（<code class="inline">scripts/evaluate.py</code>）。</li>
-          </ul>
         </div>
       </div>
     </section>
@@ -332,8 +316,8 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
     <section>
       <div class="wrap">
         <div class="cta-band">
-          <h2>用自己的密钥部署审核能力</h2>
-          <p>克隆仓库、配置环境、Compose 启动 — 或先点开在线演示。</p>
+          <h2>免费的 Ollama 审核，随时可接</h2>
+          <p>克隆仓库，把 sub2api 或 SDK 指过来，配好多 Key —— 或者先点开在线演示。</p>
           <div class="cta-row" style="justify-content: center;">
             <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">在 GitHub 上 Star / Fork</a>
             <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">阅读 README</a>
@@ -346,7 +330,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
   <footer class="footer">
     <div class="wrap footer-inner">
       <div>
-        Ollama Moderation Gateway · Apache-2.0 · 独立实现
+        Ollama Moderation Gateway · 免费 Ollama AI 审核 · Apache-2.0
       </div>
       <div>
         <a href="../">EN</a>

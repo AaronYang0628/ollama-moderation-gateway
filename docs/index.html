@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ollama Moderation Gateway — OpenAI-compatible content safety</title>
-  <meta name="description" content="OpenAI-compatible Moderations API gateway over Ollama Cloud or self-hosted models. Multi-key pool, FastAPI, Docker, fail-closed. Heuristic scores — not equivalent to OpenAI omni-moderation. Works with sub2api content audit." />
+  <title>Ollama Moderation Gateway — Free AI content moderation</title>
+  <meta name="description" content="Free Ollama AI content audit / moderation. OpenAI Moderations compatible — plug into sub2api and any Moderations client. Multi-key rotation, lightweight, easy. Not the same quality as OpenAI official moderation." />
   <meta name="theme-color" content="#0b1220" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,11 +25,10 @@
         Ollama Moderation Gateway
       </a>
       <nav class="nav-links" aria-label="Primary">
-        <a class="hide-sm" href="#features">Features</a>
-        <a class="hide-sm" href="#how">How it works</a>
-        <a class="hide-sm" href="#code">Code</a>
-        <a class="hide-sm" href="#integrations">Integrations</a>
-        <a class="hide-sm" href="#disclaimer">Disclaimer</a>
+        <a class="hide-sm" href="#features">Why use it</a>
+        <a class="hide-sm" href="#integrations">sub2api</a>
+        <a class="hide-sm" href="#code">Get started</a>
+        <a class="hide-sm" href="#disclaimer">Note</a>
         <a href="https://github.com/AaronYang0628/ollama-moderation-gateway">GitHub</a>
         <span class="lang-switch" aria-label="Language">
           <span class="lang-current" aria-current="page">EN</span>
@@ -45,17 +44,17 @@
     <section class="hero">
       <div class="wrap hero-grid">
         <div>
-          <div class="eyebrow">OpenAI-compatible · Ollama-backed · Apache-2.0</div>
-          <h1>Self-hosted moderations with the API shape your stack already knows</h1>
+          <div class="eyebrow">Free · Ollama AI · OpenAI Moderations compatible</div>
+          <h1>Free AI content moderation that plugs right in</h1>
           <p class="hero-lead">
-            A FastAPI gateway that speaks <code class="inline">POST /v1/moderations</code>,
-            routes scoring through Ollama Cloud or your own models, and stays
-            <strong>fail-closed</strong> when the provider hiccups.
+            Screen text with Ollama — cloud or your own machine — through the same
+            <code class="inline">/v1/moderations</code> API your tools already speak.
+            Lightweight, multi-key ready, and especially easy with
+            <strong>sub2api</strong>.
           </p>
           <p class="zh-summary">
-            <strong>中文摘要：</strong>基于 Ollama（云端或自托管）的 OpenAI 兼容内容审核网关。
-            通用模型 + 启发式评分，<strong>不等同于</strong> OpenAI omni-moderation。
-            多 Key 池、Docker、上游失败不伪造 <code class="inline">flagged=false</code>。
+            <strong>中文：</strong>免费的 Ollama AI 内容审核。兼容 OpenAI Moderations，可直接对接 sub2api。
+            轻量、多 Key 轮换、即插即用。质量不等同于 OpenAI 官方审核。
             <a href="zh/">完整中文页面 →</a>
           </p>
           <div class="cta-row">
@@ -64,17 +63,17 @@
             <a class="btn btn-ghost" href="https://ollama-moderation-gateway.onrender.com">Try demo</a>
           </div>
           <div class="meta-row">
-            <span class="chip">Multi-key pool</span>
-            <span class="chip">Docker / Compose</span>
-            <span class="chip">Policy YAML</span>
-            <span class="chip">Heuristic scores</span>
+            <span class="chip">Free Ollama audit</span>
+            <span class="chip">Multi-key rotation</span>
+            <span class="chip">Lightweight</span>
+            <span class="chip">sub2api ready</span>
           </div>
         </div>
         <aside class="hero-card" aria-label="Sample request">
           <div class="hero-card-top">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           </div>
-          <pre><span class="tok-cm"># OpenAI SDK → your gateway</span>
+          <pre><span class="tok-cm"># Same OpenAI Moderations call — your gateway</span>
 <span class="tok-key">from</span> openai <span class="tok-key">import</span> OpenAI
 
 client = OpenAI(
@@ -93,70 +92,140 @@ print(result.results[0].flagged)</pre>
 
     <section id="features">
       <div class="wrap">
-        <h2 class="section-title">Built for operators who want control</h2>
+        <h2 class="section-title">Why people use it</h2>
         <p class="section-lead">
-          Keep the Moderations client contract; choose where inference runs.
-          Rotate keys, tune thresholds, ship with Docker.
+          Skip OpenAI Moderations fees. Keep the client you already have.
+          Add free Ollama-backed content audit in minutes.
         </p>
         <div class="grid-3">
           <article class="card">
-            <div class="icon" aria-hidden="true">⇄</div>
-            <h3>Drop-in API surface</h3>
-            <p><code class="inline">/v1/moderations</code>, <code class="inline">/v1/models</code>, health &amp; readiness — OpenAI-style errors and responses.</p>
+            <div class="icon" aria-hidden="true">✦</div>
+            <h3>Free AI content audit</h3>
+            <p>Run moderation on Ollama Cloud or a self-hosted model — no OpenAI Moderations bill for everyday screening.</p>
           </article>
           <article class="card">
-            <div class="icon" aria-hidden="true">☁</div>
-            <h3>Cloud or self-hosted</h3>
-            <p>Defaults to Ollama Cloud (<code class="inline">ollama.com</code>). Point <code class="inline">OLLAMA_BASE_URL</code> at a private host when you need air-gapped inference.</p>
+            <div class="icon" aria-hidden="true">⇄</div>
+            <h3>OpenAI Moderations compatible</h3>
+            <p>Same <code class="inline">POST /v1/moderations</code> shape. Point the OpenAI SDK, sub2api, or any Moderations client at this gateway.</p>
           </article>
           <article class="card">
             <div class="icon" aria-hidden="true">⟳</div>
-            <h3>Multi-key pool</h3>
-            <p>Round-robin across <code class="inline">OLLAMA_API_KEYS</code>. Cooldown on 401 / 403 / 429 / quota so one bad key doesn’t stall traffic.</p>
+            <h3>Multi-key rotation</h3>
+            <p>Drop several Ollama keys in. The gateway round-robins and cools down keys that hit 401 / 403 / 429 / quota — traffic keeps moving.</p>
           </article>
           <article class="card">
-            <div class="icon" aria-hidden="true">☰</div>
-            <h3>Policy you can edit</h3>
-            <p>YAML thresholds per category plus <code class="inline">uncertain_mode</code>: flag, allow, or error near the boundary.</p>
+            <div class="icon" aria-hidden="true">◈</div>
+            <h3>Lightweight plug-in</h3>
+            <p>One small service. Docker Compose or a quick local start. No heavy platform, no custom client to rewrite.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">☁</div>
+            <h3>Cloud or your own box</h3>
+            <p>Defaults to Ollama Cloud. Prefer private? Point it at your local Ollama and keep data on your network.</p>
           </article>
           <article class="card">
             <div class="icon" aria-hidden="true">⏹</div>
-            <h3>Fail-closed</h3>
-            <p>Provider or parse failures return 502 / 503 / 504. The gateway never invents a clean <code class="inline">flagged=false</code>.</p>
-          </article>
-          <article class="card">
-            <div class="icon" aria-hidden="true">▣</div>
-            <h3>Ops-ready MVP</h3>
-            <p>FastAPI, Docker Compose, log redaction, constant-time API key compare, pytest with mocked Ollama.</p>
+            <h3>Doesn’t fake “safe”</h3>
+            <p>If the model is down or the response is unusable, you get an error — never a made-up “all clear.”</p>
           </article>
         </div>
       </div>
     </section>
 
-    <section id="how">
+    <section id="integrations">
       <div class="wrap">
-        <h2 class="section-title">How it works</h2>
-        <p class="section-lead">A thin, honest pipeline — general chat models + structured JSON, then your thresholds.</p>
+        <h2 class="section-title">Plug into sub2api in minutes</h2>
+        <p class="section-lead">
+          The sweet spot:
+          <a href="https://github.com/Wei-Shaw/sub2api" rel="noopener">sub2api</a>
+          content audit (风控中心 · 内容审计) already expects an OpenAI-style Moderations backend.
+          This gateway is that backend — free Ollama scoring behind the UI you already use.
+        </p>
+
+        <div class="callout">
+          <strong>One change.</strong>
+          Keep sub2api’s risk-control screens. Swap the Moderations base URL to this gateway.
+          No custom client, no new protocol — just free Ollama AI moderation on the back end.
+        </div>
+
+        <h3 style="margin: 1.75rem 0 0.85rem; font-size: 1.05rem;">Quick setup</h3>
         <div class="steps">
           <div class="step">
             <div class="step-num">1</div>
             <div>
-              <h3>Client calls Moderations</h3>
-              <p>Your app (or OpenAI SDK) posts to the gateway with a model alias like <code class="inline">moderation-fast</code>.</p>
+              <h3>Base URL — no trailing <code class="inline">/v1</code></h3>
+              <p>
+                Use
+                <code class="inline">https://ollama-moderation-gateway.onrender.com</code>
+                <strong>without</strong> <code class="inline">/v1</code>.
+                sub2api appends <code class="inline">/v1/moderations</code>;
+                adding <code class="inline">/v1</code> yourself breaks the path.
+              </p>
             </div>
           </div>
           <div class="step">
             <div class="step-num">2</div>
             <div>
-              <h3>Gateway talks to Ollama</h3>
-              <p>Native <code class="inline">POST /api/chat</code> with JSON Schema structured output. Keys rotate; cooldowns apply on auth/rate failures.</p>
+              <h3>Model</h3>
+              <p>
+                <code class="inline">moderation-fast</code>
+                (or the <code class="inline">omni-moderation-latest</code> alias if your UI prefers that name).
+              </p>
             </div>
           </div>
           <div class="step">
             <div class="step-num">3</div>
             <div>
-              <h3>Scores meet policy</h3>
-              <p>Heuristic category scores (0–1) are compared to <code class="inline">configs/policy.yaml</code>. Uncertain cases follow your configured mode.</p>
+              <h3>API Key = gateway key</h3>
+              <p>
+                Use the gateway’s <code class="inline">MODERATION_API_KEY</code>,
+                <strong>not</strong> an Ollama Cloud key.
+                Public demo may need your own deploy key.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div>
+              <h3>Set <code class="inline">timeout_ms</code> to <code class="inline">30000</code></h3>
+              <p>
+                Default <code class="inline">3000</code> is too short for cloud LLMs and free-tier cold starts.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <p style="margin: 1.25rem 0 0; color: var(--muted); font-size: 0.95rem;">
+          sub2api:
+          <a href="https://github.com/Wei-Shaw/sub2api" rel="noopener">github.com/Wei-Shaw/sub2api</a>
+        </p>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="wrap">
+        <h2 class="section-title">How it fits together</h2>
+        <p class="section-lead">Three steps. No architecture lecture.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <h3>Your app calls Moderations</h3>
+              <p>OpenAI SDK, sub2api, curl — anything that posts to <code class="inline">/v1/moderations</code>.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <h3>Gateway asks Ollama</h3>
+              <p>Keys rotate. You choose cloud or self-hosted. Models like <code class="inline">moderation-fast</code> map to Ollama chat models.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <h3>You get a familiar result</h3>
+              <p>OpenAI-style <code class="inline">flagged</code> / categories / scores — ready for your existing risk flow.</p>
             </div>
           </div>
         </div>
@@ -166,8 +235,8 @@ print(result.results[0].flagged)</pre>
           <table>
             <thead>
               <tr>
-                <th>Client model</th>
-                <th>Ollama model</th>
+                <th>You send</th>
+                <th>Ollama runs</th>
                 <th>Notes</th>
               </tr>
             </thead>
@@ -175,22 +244,22 @@ print(result.results[0].flagged)</pre>
               <tr>
                 <td><code class="inline">moderation-fast</code></td>
                 <td><code class="inline">gpt-oss:20b</code></td>
-                <td>Default path</td>
+                <td>Good default</td>
               </tr>
               <tr>
                 <td><code class="inline">moderation-standard</code></td>
                 <td><code class="inline">gemma4:31b</code></td>
-                <td>Heavier reasoning budget</td>
+                <td>Heavier option</td>
               </tr>
               <tr>
                 <td><code class="inline">moderation-accurate</code></td>
                 <td><code class="inline">gpt-oss:120b</code></td>
-                <td>Largest; needs serious resources self-hosted</td>
+                <td>Largest; needs serious hardware self-hosted</td>
               </tr>
               <tr>
                 <td><code class="inline">omni-moderation-latest</code></td>
                 <td><code class="inline">gpt-oss:20b</code></td>
-                <td>Compatibility alias only — not OpenAI parity</td>
+                <td>Name alias only — not OpenAI quality</td>
               </tr>
             </tbody>
           </table>
@@ -201,10 +270,10 @@ print(result.results[0].flagged)</pre>
     <section id="code">
       <div class="wrap">
         <h2 class="section-title">Get running in minutes</h2>
-        <p class="section-lead">Placeholder keys in docs are for local smoke only. Never commit real secrets.</p>
+        <p class="section-lead">Placeholder keys are for local smoke only. Never commit real secrets.</p>
         <div class="split">
           <div>
-            <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">Local (dev)</h3>
+            <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">Local</h3>
             <pre class="code-block">git clone https://github.com/AaronYang0628/ollama-moderation-gateway.git
 cd ollama-moderation-gateway
 python -m venv .venv &amp;&amp; source .venv/bin/activate
@@ -225,106 +294,22 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
   }'</pre>
             <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
               Demo: <a href="https://ollama-moderation-gateway.onrender.com">onrender.com</a> —
-              free tier cold starts; bring your own keys for production.
+              free tier may cold-start; use your own keys in production.
             </p>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="integrations">
-      <div class="wrap">
-        <h2 class="section-title">Used with sub2api</h2>
-        <p class="section-lead">
-          Real-world wiring: point
-          <a href="https://github.com/Wei-Shaw/sub2api" rel="noopener">sub2api</a>
-          content audit (风控中心 · 内容审计) at this gateway as an OpenAI-compatible Moderations backend —
-          same <code class="inline">/v1/moderations</code> contract, your own Ollama-backed scoring.
-        </p>
-
-        <div class="callout">
-          <strong>Why it fits.</strong>
-          sub2api expects an OpenAI-style moderations base. This gateway speaks that dialect,
-          so you can keep sub2api’s risk-control UI while inference runs through Ollama Cloud or your own host —
-          without inventing a custom client.
-        </div>
-
-        <h3 style="margin: 1.75rem 0 0.85rem; font-size: 1.05rem;">Verified config tips</h3>
-        <div class="steps">
-          <div class="step">
-            <div class="step-num">1</div>
-            <div>
-              <h3>Base URL — no trailing <code class="inline">/v1</code></h3>
-              <p>
-                Set Base URL to
-                <code class="inline">https://ollama-moderation-gateway.onrender.com</code>
-                <strong>without</strong> <code class="inline">/v1</code>.
-                sub2api appends <code class="inline">/v1/moderations</code> itself;
-                including <code class="inline">/v1</code> produces <code class="inline">/v1/v1/...</code>
-                and <code class="inline">{"detail":"Not Found"}</code>.
-              </p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">2</div>
-            <div>
-              <h3>Model</h3>
-              <p>
-                Use <code class="inline">moderation-fast</code>
-                (or the <code class="inline">omni-moderation-latest</code> compatibility alias).
-              </p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">3</div>
-            <div>
-              <h3>API Key = gateway key</h3>
-              <p>
-                Paste the gateway’s <code class="inline">MODERATION_API_KEY</code>,
-                <strong>not</strong> an Ollama Cloud key.
-                Docs use <code class="inline">your-gateway-api-key</code> as a placeholder —
-                the public demo may require your own deploy key.
-              </p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">4</div>
-            <div>
-              <h3>Raise <code class="inline">timeout_ms</code> to <code class="inline">30000</code></h3>
-              <p>
-                Default <code class="inline">3000</code> is too short for cloud LLM latency plus Render cold start.
-                Set <code class="inline">timeout_ms</code> to <code class="inline">30000</code> (30s).
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="callout callout-warn" style="margin-top: 1.25rem;">
-          <strong>Reminder:</strong> scores are heuristic risk estimates from general chat models —
-          <strong>not</strong> equivalent to OpenAI <code class="inline">omni-moderation-latest</code>.
-          Evaluate on your traffic before relying on it in production.
-        </div>
-
-        <p style="margin: 1.25rem 0 0; color: var(--muted); font-size: 0.95rem;">
-          Integration reference:
-          <a href="https://github.com/Wei-Shaw/sub2api" rel="noopener">github.com/Wei-Shaw/sub2api</a>.
-          This page documents only this verified pairing — not a catalog of other products.
-        </p>
-      </div>
-    </section>
-
     <section id="disclaimer">
       <div class="wrap">
         <div class="disclaimer">
-          <h2>Important: not equivalent to OpenAI omni-moderation</h2>
+          <h2>One honest note</h2>
           <p style="margin: 0; color: #f3cfc8;">
-            Scoring uses <strong>general-purpose chat models</strong>, not dedicated safety classifiers.
+            This is <strong>not</strong> the same quality as OpenAI’s official moderation models
+            (<code class="inline">omni-moderation-latest</code>). It uses general Ollama chat models for free / self-hosted content audit —
+            great for cost and control, different from dedicated OpenAI safety classifiers. Try it on your own traffic before you rely on it.
           </p>
-          <ul>
-            <li><code class="inline">category_scores</code> are heuristic risk estimates (0–1), not calibrated probabilities.</li>
-            <li>Quality, score scale, and behavior differ from OpenAI <code class="inline">omni-moderation-latest</code>.</li>
-            <li>Evaluate on your languages and risk profile before production (<code class="inline">scripts/evaluate.py</code>).</li>
-          </ul>
         </div>
       </div>
     </section>
@@ -332,8 +317,8 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
     <section>
       <div class="wrap">
         <div class="cta-band">
-          <h2>Ship moderation behind your own keys</h2>
-          <p>Clone the repo, set env, compose up — or poke the live demo first.</p>
+          <h2>Free Ollama moderation, ready to plug in</h2>
+          <p>Clone it, point sub2api or your SDK at it, rotate keys — or poke the live demo first.</p>
           <div class="cta-row" style="justify-content: center;">
             <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">Star / fork on GitHub</a>
             <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">Read the README</a>
@@ -346,7 +331,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
   <footer class="footer">
     <div class="wrap footer-inner">
       <div>
-        Ollama Moderation Gateway · Apache-2.0 · Independent implementation
+        Ollama Moderation Gateway · Free Ollama AI moderation · Apache-2.0
       </div>
       <div>
         <a href="zh/">中文</a>
