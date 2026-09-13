@@ -13,7 +13,7 @@ Drop-in for clients that speak `POST /v1/moderations`. Multi-key pool, FastAPI, 
 | | |
 |---|---|
 | **Repo** | [github.com/AaronYang0628/ollama-moderation-gateway](https://github.com/AaronYang0628/ollama-moderation-gateway) |
-| **Site** | [aaronyang0628.github.io/ollama-moderation-gateway](https://aaronyang0628.github.io/ollama-moderation-gateway/) |
+| **Site** | [EN](https://aaronyang0628.github.io/ollama-moderation-gateway/) · [中文](https://aaronyang0628.github.io/ollama-moderation-gateway/zh/) |
 | **Live demo** | [ollama-moderation-gateway.onrender.com](https://ollama-moderation-gateway.onrender.com) *(cold starts; use your own keys in production)* |
 
 ---
@@ -157,6 +157,25 @@ Errors:
 ```
 
 Configuration priority: process env → `.env` (pydantic-settings) → code defaults. Full list in `.env.example`. Policy thresholds: `configs/policy.yaml` (`POLICY_PATH`). Env `UNCERTAIN_MODE` overrides YAML `uncertain_mode`.
+
+
+## Integrations
+
+### sub2api（风控中心 · 内容审计）
+
+[sub2api](https://github.com/Wei-Shaw/sub2api) can point its content-audit Moderations backend at this gateway.
+
+Verified tips (also on the [EN](https://aaronyang0628.github.io/ollama-moderation-gateway/#integrations) / [中文](https://aaronyang0628.github.io/ollama-moderation-gateway/zh/#integrations) Pages):
+
+- **Base URL:** `https://ollama-moderation-gateway.onrender.com` — **no** trailing `/v1` (sub2api appends `/v1/moderations`; `/v1` → `/v1/v1/...` → `{"detail":"Not Found"}`)
+- **Model:** `moderation-fast` (or `omni-moderation-latest` alias)
+- **API Key:** gateway `MODERATION_API_KEY` (placeholder: `your-gateway-api-key`), **not** Ollama keys; public demo may need your own deploy key
+- **timeout_ms:** `30000` (default `3000` is too short for cloud LLM + Render cold start)
+- Scores are **heuristic**, not OpenAI-equivalent
+
+### 中文文档
+
+完整产品页：[中文 GitHub Pages](https://aaronyang0628.github.io/ollama-moderation-gateway/zh/) · 英文：[EN](https://aaronyang0628.github.io/ollama-moderation-gateway/)
 
 ## Evaluation
 

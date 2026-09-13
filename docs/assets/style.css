@@ -524,3 +524,54 @@ code.inline {
     width: 100%;
   }
 }
+
+/* Language switcher */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.lang-switch a {
+  color: var(--muted);
+}
+
+.lang-switch a:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.lang-current {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.lang-sep {
+  opacity: 0.45;
+}
+
+/* Callouts (integrations tips) */
+.callout {
+  padding: 1rem 1.15rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(61, 154, 139, 0.35);
+  background: var(--teal-soft);
+  color: #c5e8e1;
+  font-size: 0.95rem;
+}
+
+.callout strong {
+  color: #8fd4c8;
+}
+
+.callout-warn {
+  border-color: rgba(212, 137, 74, 0.4);
+  background: var(--copper-soft);
+  color: #f0d2b4;
+}
+
+.callout-warn strong {
+  color: #f0c49a;
+}

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ollama Moderation Gateway — OpenAI-compatible content safety</title>
-  <meta name="description" content="OpenAI-compatible Moderations API gateway over Ollama Cloud or self-hosted models. Multi-key pool, FastAPI, Docker, fail-closed. Heuristic scores — not equivalent to OpenAI omni-moderation." />
+  <meta name="description" content="OpenAI-compatible Moderations API gateway over Ollama Cloud or self-hosted models. Multi-key pool, FastAPI, Docker, fail-closed. Heuristic scores — not equivalent to OpenAI omni-moderation. Works with sub2api content audit." />
   <meta name="theme-color" content="#0b1220" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,8 +28,14 @@
         <a class="hide-sm" href="#features">Features</a>
         <a class="hide-sm" href="#how">How it works</a>
         <a class="hide-sm" href="#code">Code</a>
+        <a class="hide-sm" href="#integrations">Integrations</a>
         <a class="hide-sm" href="#disclaimer">Disclaimer</a>
         <a href="https://github.com/AaronYang0628/ollama-moderation-gateway">GitHub</a>
+        <span class="lang-switch" aria-label="Language">
+          <span class="lang-current" aria-current="page">EN</span>
+          <span class="lang-sep" aria-hidden="true">·</span>
+          <a href="zh/">中文</a>
+        </span>
         <a class="btn btn-primary" href="https://ollama-moderation-gateway.onrender.com">Live demo</a>
       </nav>
     </div>
@@ -50,6 +56,7 @@
             <strong>中文摘要：</strong>基于 Ollama（云端或自托管）的 OpenAI 兼容内容审核网关。
             通用模型 + 启发式评分，<strong>不等同于</strong> OpenAI omni-moderation。
             多 Key 池、Docker、上游失败不伪造 <code class="inline">flagged=false</code>。
+            <a href="zh/">完整中文页面 →</a>
           </p>
           <div class="cta-row">
             <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">View on GitHub</a>
@@ -200,7 +207,7 @@ print(result.results[0].flagged)</pre>
             <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">Local (dev)</h3>
             <pre class="code-block">git clone https://github.com/AaronYang0628/ollama-moderation-gateway.git
 cd ollama-moderation-gateway
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv &amp;&amp; source .venv/bin/activate
 pip install -e ".[dev]"
 cp .env.example .env
 export APP_ENV=development
@@ -222,6 +229,87 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
             </p>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section id="integrations">
+      <div class="wrap">
+        <h2 class="section-title">Used with sub2api</h2>
+        <p class="section-lead">
+          Real-world wiring: point
+          <a href="https://github.com/Wei-Shaw/sub2api" rel="noopener">sub2api</a>
+          content audit (风控中心 · 内容审计) at this gateway as an OpenAI-compatible Moderations backend —
+          same <code class="inline">/v1/moderations</code> contract, your own Ollama-backed scoring.
+        </p>
+
+        <div class="callout">
+          <strong>Why it fits.</strong>
+          sub2api expects an OpenAI-style moderations base. This gateway speaks that dialect,
+          so you can keep sub2api’s risk-control UI while inference runs through Ollama Cloud or your own host —
+          without inventing a custom client.
+        </div>
+
+        <h3 style="margin: 1.75rem 0 0.85rem; font-size: 1.05rem;">Verified config tips</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <h3>Base URL — no trailing <code class="inline">/v1</code></h3>
+              <p>
+                Set Base URL to
+                <code class="inline">https://ollama-moderation-gateway.onrender.com</code>
+                <strong>without</strong> <code class="inline">/v1</code>.
+                sub2api appends <code class="inline">/v1/moderations</code> itself;
+                including <code class="inline">/v1</code> produces <code class="inline">/v1/v1/...</code>
+                and <code class="inline">{"detail":"Not Found"}</code>.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <h3>Model</h3>
+              <p>
+                Use <code class="inline">moderation-fast</code>
+                (or the <code class="inline">omni-moderation-latest</code> compatibility alias).
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <h3>API Key = gateway key</h3>
+              <p>
+                Paste the gateway’s <code class="inline">MODERATION_API_KEY</code>,
+                <strong>not</strong> an Ollama Cloud key.
+                Docs use <code class="inline">your-gateway-api-key</code> as a placeholder —
+                the public demo may require your own deploy key.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div>
+              <h3>Raise <code class="inline">timeout_ms</code> to <code class="inline">30000</code></h3>
+              <p>
+                Default <code class="inline">3000</code> is too short for cloud LLM latency plus Render cold start.
+                Set <code class="inline">timeout_ms</code> to <code class="inline">30000</code> (30s).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-warn" style="margin-top: 1.25rem;">
+          <strong>Reminder:</strong> scores are heuristic risk estimates from general chat models —
+          <strong>not</strong> equivalent to OpenAI <code class="inline">omni-moderation-latest</code>.
+          Evaluate on your traffic before relying on it in production.
+        </div>
+
+        <p style="margin: 1.25rem 0 0; color: var(--muted); font-size: 0.95rem;">
+          Integration reference:
+          <a href="https://github.com/Wei-Shaw/sub2api" rel="noopener">github.com/Wei-Shaw/sub2api</a>.
+          This page documents only this verified pairing — not a catalog of other products.
+        </p>
       </div>
     </section>
 
@@ -261,6 +349,8 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
         Ollama Moderation Gateway · Apache-2.0 · Independent implementation
       </div>
       <div>
+        <a href="zh/">中文</a>
+        ·
         <a href="https://github.com/AaronYang0628/ollama-moderation-gateway">GitHub</a>
         ·
         <a href="https://ollama-moderation-gateway.onrender.com">Demo</a>
