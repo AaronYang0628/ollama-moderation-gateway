@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-import secrets
+import hashlib
+import hmac
 import uuid
 from typing import Annotated
 
@@ -26,14 +27,22 @@ async def require_api_key(
     authorization: Annotated[str | None, Header()] = None,
 ) -> None:
     settings: Settings = request.app.state.settings
-    expected = settings.moderation_api_key
-    if not expected:
+    expected_keys = settings.moderation_api_key_list
+    if not expected_keys:
         # Auth disabled (dev/test only)
         return
     if not authorization or not authorization.lower().startswith("bearer "):
         raise AuthenticationError()
     token = authorization.split(" ", 1)[1].strip()
-    if not secrets.compare_digest(token, expected):
+    # Compare against every configured key (no early return) using equal-length
+    # SHA-256 digests so length mismatches cannot skip the constant-time step.
+    token_digest = hashlib.sha256(token.encode("utf-8")).digest()
+    matched = False
+    for key in expected_keys:
+        key_digest = hashlib.sha256(key.encode("utf-8")).digest()
+        if hmac.compare_digest(token_digest, key_digest):
+            matched = True
+    if not matched:
         raise AuthenticationError()
 
 

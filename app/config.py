@@ -39,6 +39,7 @@ class Settings(BaseSettings):
     ollama_api_keys: str | None = Field(default=None, alias="OLLAMA_API_KEYS")
 
     moderation_api_key: str | None = Field(default=None, alias="MODERATION_API_KEY")
+    moderation_api_keys: str | None = Field(default=None, alias="MODERATION_API_KEYS")
 
     default_moderation_model: str = Field(
         default="moderation-fast", alias="DEFAULT_MODERATION_MODEL"
@@ -99,9 +100,10 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def _validate_production(self) -> Settings:
         if self.is_production:
-            if not self.moderation_api_key:
+            if not self.moderation_api_key_list:
                 raise ValueError(
-                    "MODERATION_API_KEY is required when APP_ENV=production"
+                    "At least one gateway key (MODERATION_API_KEYS or MODERATION_API_KEY) "
+                    "is required when APP_ENV=production"
                 )
             if self.targets_ollama_cloud and not self.ollama_api_key_list:
                 raise ValueError(
@@ -131,6 +133,16 @@ class Settings(BaseSettings):
         if self.ollama_api_key and self.ollama_api_key.strip():
             if self.ollama_api_key.strip() not in keys:
                 keys.append(self.ollama_api_key.strip())
+        return keys
+
+    @property
+    def moderation_api_key_list(self) -> list[str]:
+        keys: list[str] = []
+        if self.moderation_api_keys:
+            keys.extend(k.strip() for k in self.moderation_api_keys.split(",") if k.strip())
+        if self.moderation_api_key and self.moderation_api_key.strip():
+            if self.moderation_api_key.strip() not in keys:
+                keys.append(self.moderation_api_key.strip())
         return keys
 
     @property

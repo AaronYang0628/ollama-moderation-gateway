@@ -11,7 +11,7 @@ SECRET_PATTERNS = [
     re.compile(r"(Bearer\s+)([A-Za-z0-9._\-]+)", re.IGNORECASE),
     re.compile(r"(api[_-]?key[\"']?\s*[:=]\s*[\"']?)([^\"'\s,]+)", re.IGNORECASE),
     re.compile(r"(OLLAMA_API_KEY[S]?[\"']?\s*[:=]\s*[\"']?)([^\"'\s,]+)", re.IGNORECASE),
-    re.compile(r"(MODERATION_API_KEY[\"']?\s*[:=]\s*[\"']?)([^\"'\s,]+)", re.IGNORECASE),
+    re.compile(r"(MODERATION_API_KEYS?[\"']?\s*[:=]\s*[\"']?)([^\"'\s]+)", re.IGNORECASE),
 ]
 
 

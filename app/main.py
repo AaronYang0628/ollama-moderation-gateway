@@ -29,9 +29,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
     setup_logging(settings.log_level)
 
-    if not settings.moderation_api_key and not settings.is_production:
+    if not settings.moderation_api_key_list and not settings.is_production:
         logger.warning(
-            "MODERATION_API_KEY is not set — authentication is DISABLED (dev/test only)"
+            "No gateway API key set — authentication is DISABLED (dev/test only)"
         )
     if settings.log_raw_input:
         logger.warning("LOG_RAW_INPUT=true — raw user input may appear in logs (HIGH RISK)")

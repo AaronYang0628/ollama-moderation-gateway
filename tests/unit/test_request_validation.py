@@ -82,3 +82,81 @@ async def test_models_list(test_settings: Settings, auth_headers: dict) -> None:
             ids = {m["id"] for m in resp.json()["data"]}
             assert "moderation-fast" in ids
             assert "omni-moderation-latest" in ids
+
+
+def test_moderation_api_key_list_merges(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.config import clear_settings_cache
+
+    clear_settings_cache()
+    monkeypatch.setenv("APP_ENV", "test")
+    monkeypatch.setenv("MODERATION_API_KEYS", " key-a ,key-b, ")
+    monkeypatch.setenv("MODERATION_API_KEY", "key-a")
+    monkeypatch.setenv("OLLAMA_BASE_URL", "http://ollama.test")
+    monkeypatch.setenv("OLLAMA_API_KEYS", "")
+    monkeypatch.setenv("OLLAMA_API_KEY", "")
+    clear_settings_cache()
+    settings = Settings()
+    assert settings.moderation_api_key_list == ["key-a", "key-b"]
+
+
+def test_production_requires_gateway_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.config import clear_settings_cache
+
+    clear_settings_cache()
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("MODERATION_API_KEY", "")
+    monkeypatch.setenv("MODERATION_API_KEYS", "")
+    monkeypatch.setenv("OLLAMA_BASE_URL", "http://ollama.test")
+    monkeypatch.setenv("OLLAMA_API_KEYS", "")
+    monkeypatch.setenv("OLLAMA_API_KEY", "")
+    clear_settings_cache()
+    with pytest.raises(ValidationError):
+        Settings()
+
+
+def test_production_accepts_keys_list_only(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.config import clear_settings_cache
+
+    clear_settings_cache()
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("MODERATION_API_KEY", "")
+    monkeypatch.setenv("MODERATION_API_KEYS", "prod-key-1,prod-key-2")
+    monkeypatch.setenv("OLLAMA_BASE_URL", "http://ollama.test")
+    monkeypatch.setenv("OLLAMA_API_KEYS", "")
+    monkeypatch.setenv("OLLAMA_API_KEY", "")
+    clear_settings_cache()
+    settings = Settings()
+    assert settings.moderation_api_key_list == ["prod-key-1", "prod-key-2"]
+
+
+@pytest.mark.asyncio
+async def test_multi_key_auth_accepts_any(
+    policy_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.config import clear_settings_cache
+
+    clear_settings_cache()
+    monkeypatch.setenv("APP_ENV", "test")
+    monkeypatch.setenv("MODERATION_API_KEY", "legacy-key")
+    monkeypatch.setenv("MODERATION_API_KEYS", "key-one,key-two")
+    monkeypatch.setenv("OLLAMA_BASE_URL", "http://ollama.test")
+    monkeypatch.setenv("OLLAMA_API_KEYS", "")
+    monkeypatch.setenv("OLLAMA_API_KEY", "")
+    monkeypatch.setenv("POLICY_PATH", str(policy_path))
+    monkeypatch.setenv("ENABLE_DOCS", "true")
+    clear_settings_cache()
+    settings = Settings()
+    assert settings.moderation_api_key_list == ["key-one", "key-two", "legacy-key"]
+    app = create_app(settings)
+    async with app.router.lifespan_context(app):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            for key in ("key-one", "key-two", "legacy-key"):
+                resp = await client.get(
+                    "/v1/models", headers={"Authorization": f"Bearer {key}"}
+                )
+                assert resp.status_code == 200, key
+            resp = await client.get(
+                "/v1/models", headers={"Authorization": "Bearer no-such-key"}
+            )
+            assert resp.status_code == 401
