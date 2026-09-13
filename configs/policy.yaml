@@ -1,0 +1,82 @@
+version: v1
+uncertain_mode: flag
+default_threshold: 0.50
+categories:
+  sexual:
+    enabled: true
+    threshold: 0.50
+    description: "性相关内容"
+    positive_example: "Explicit sexual description intended to arouse"
+    negative_example: "Clinical discussion of reproductive health"
+  sexual/minors:
+    enabled: true
+    threshold: 0.30
+    description: "涉及未成年人的性内容"
+    positive_example: "Sexual content involving anyone under 18"
+    negative_example: "News report about child protection laws"
+  harassment:
+    enabled: true
+    threshold: 0.55
+    description: "骚扰、侮辱、贬损"
+    positive_example: "Sustained personal insults intending to demean"
+    negative_example: "Polite disagreement about a product"
+  harassment/threatening:
+    enabled: true
+    threshold: 0.45
+    description: "带威胁的骚扰"
+    positive_example: "Threats of harm directed at a person"
+    negative_example: "Fictional dialogue about conflict"
+  hate:
+    enabled: true
+    threshold: 0.50
+    description: "仇恨内容"
+    positive_example: "Dehumanizing statements about a protected group"
+    negative_example: "Historical analysis of discrimination"
+  hate/threatening:
+    enabled: true
+    threshold: 0.40
+    description: "带威胁的仇恨内容"
+    positive_example: "Calls for violence against a protected group"
+    negative_example: "Reporting on hate crime statistics"
+  illicit:
+    enabled: true
+    threshold: 0.55
+    description: "违法活动协助"
+    positive_example: "Step-by-step instructions to commit fraud"
+    negative_example: "Academic discussion of fraud typology"
+  illicit/violent:
+    enabled: true
+    threshold: 0.40
+    description: "暴力违法活动协助"
+    positive_example: "How to build a weapon for an attack"
+    negative_example: "News coverage of a violent crime"
+  self-harm:
+    enabled: true
+    threshold: 0.45
+    description: "自残、自杀相关内容"
+    positive_example: "Encouraging someone to hurt themselves"
+    negative_example: "Mental health support resource listing"
+  self-harm/intent:
+    enabled: true
+    threshold: 0.35
+    description: "自残或自杀意图"
+    positive_example: "Expressing clear intent to attempt suicide soon"
+    negative_example: "Past tense discussion of recovery"
+  self-harm/instructions:
+    enabled: true
+    threshold: 0.35
+    description: "自残或自杀方法指导"
+    positive_example: "Detailed methods for self-harm or suicide"
+    negative_example: "Crisis hotline information"
+  violence:
+    enabled: true
+    threshold: 0.55
+    description: "暴力内容"
+    positive_example: "Graphic description of assaulting someone"
+    negative_example: "Sports reporting of a hard tackle"
+  violence/graphic:
+    enabled: true
+    threshold: 0.45
+    description: "血腥、肢解等图像化暴力描述"
+    positive_example: "Detailed gore and dismemberment description"
+    negative_example: "Medical trauma case study without sensationalism"
