@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ollama Moderation Gateway — OpenAI-compatible content safety</title>
+  <meta name="description" content="OpenAI-compatible Moderations API gateway over Ollama Cloud or self-hosted models. Multi-key pool, FastAPI, Docker, fail-closed. Heuristic scores — not equivalent to OpenAI omni-moderation." />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233d9a8b'/%3E%3Cpath d='M8 16h16M16 8v16' stroke='%230b1220' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3l8 4v5c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V7l8-4z" stroke="#0b1220" stroke-width="2" fill="none"/>
+            <path d="M9 12.5l2 2 4-4" stroke="#0b1220" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        Ollama Moderation Gateway
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a class="hide-sm" href="#features">Features</a>
+        <a class="hide-sm" href="#how">How it works</a>
+        <a class="hide-sm" href="#code">Code</a>
+        <a class="hide-sm" href="#disclaimer">Disclaimer</a>
+        <a href="https://github.com/AaronYang0628/ollama-moderation-gateway">GitHub</a>
+        <a class="btn btn-primary" href="https://ollama-moderation-gateway.onrender.com">Live demo</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">OpenAI-compatible · Ollama-backed · Apache-2.0</div>
+          <h1>Self-hosted moderations with the API shape your stack already knows</h1>
+          <p class="hero-lead">
+            A FastAPI gateway that speaks <code class="inline">POST /v1/moderations</code>,
+            routes scoring through Ollama Cloud or your own models, and stays
+            <strong>fail-closed</strong> when the provider hiccups.
+          </p>
+          <p class="zh-summary">
+            <strong>中文摘要：</strong>基于 Ollama（云端或自托管）的 OpenAI 兼容内容审核网关。
+            通用模型 + 启发式评分，<strong>不等同于</strong> OpenAI omni-moderation。
+            多 Key 池、Docker、上游失败不伪造 <code class="inline">flagged=false</code>。
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">View on GitHub</a>
+            <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">Quick start</a>
+            <a class="btn btn-ghost" href="https://ollama-moderation-gateway.onrender.com">Try demo</a>
+          </div>
+          <div class="meta-row">
+            <span class="chip">Multi-key pool</span>
+            <span class="chip">Docker / Compose</span>
+            <span class="chip">Policy YAML</span>
+            <span class="chip">Heuristic scores</span>
+          </div>
+        </div>
+        <aside class="hero-card" aria-label="Sample request">
+          <div class="hero-card-top">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <pre><span class="tok-cm"># OpenAI SDK → your gateway</span>
+<span class="tok-key">from</span> openai <span class="tok-key">import</span> OpenAI
+
+client = OpenAI(
+    base_url=<span class="tok-str">"http://localhost:8000/v1"</span>,
+    api_key=<span class="tok-str">"local-moderation-key"</span>,
+)
+
+result = client.moderations.create(
+    model=<span class="tok-str">"moderation-fast"</span>,
+    input=<span class="tok-str">"Text to screen"</span>,
+)
+print(result.results[0].flagged)</pre>
+        </aside>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="wrap">
+        <h2 class="section-title">Built for operators who want control</h2>
+        <p class="section-lead">
+          Keep the Moderations client contract; choose where inference runs.
+          Rotate keys, tune thresholds, ship with Docker.
+        </p>
+        <div class="grid-3">
+          <article class="card">
+            <div class="icon" aria-hidden="true">⇄</div>
+            <h3>Drop-in API surface</h3>
+            <p><code class="inline">/v1/moderations</code>, <code class="inline">/v1/models</code>, health &amp; readiness — OpenAI-style errors and responses.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">☁</div>
+            <h3>Cloud or self-hosted</h3>
+            <p>Defaults to Ollama Cloud (<code class="inline">ollama.com</code>). Point <code class="inline">OLLAMA_BASE_URL</code> at a private host when you need air-gapped inference.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">⟳</div>
+            <h3>Multi-key pool</h3>
+            <p>Round-robin across <code class="inline">OLLAMA_API_KEYS</code>. Cooldown on 401 / 403 / 429 / quota so one bad key doesn’t stall traffic.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">☰</div>
+            <h3>Policy you can edit</h3>
+            <p>YAML thresholds per category plus <code class="inline">uncertain_mode</code>: flag, allow, or error near the boundary.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">⏹</div>
+            <h3>Fail-closed</h3>
+            <p>Provider or parse failures return 502 / 503 / 504. The gateway never invents a clean <code class="inline">flagged=false</code>.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">▣</div>
+            <h3>Ops-ready MVP</h3>
+            <p>FastAPI, Docker Compose, log redaction, constant-time API key compare, pytest with mocked Ollama.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="wrap">
+        <h2 class="section-title">How it works</h2>
+        <p class="section-lead">A thin, honest pipeline — general chat models + structured JSON, then your thresholds.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <h3>Client calls Moderations</h3>
+              <p>Your app (or OpenAI SDK) posts to the gateway with a model alias like <code class="inline">moderation-fast</code>.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <h3>Gateway talks to Ollama</h3>
+              <p>Native <code class="inline">POST /api/chat</code> with JSON Schema structured output. Keys rotate; cooldowns apply on auth/rate failures.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <h3>Scores meet policy</h3>
+              <p>Heuristic category scores (0–1) are compared to <code class="inline">configs/policy.yaml</code>. Uncertain cases follow your configured mode.</p>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="margin: 2rem 0 0.75rem; font-size: 1.05rem;">Model aliases</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Client model</th>
+                <th>Ollama model</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code class="inline">moderation-fast</code></td>
+                <td><code class="inline">gpt-oss:20b</code></td>
+                <td>Default path</td>
+              </tr>
+              <tr>
+                <td><code class="inline">moderation-standard</code></td>
+                <td><code class="inline">gemma4:31b</code></td>
+                <td>Heavier reasoning budget</td>
+              </tr>
+              <tr>
+                <td><code class="inline">moderation-accurate</code></td>
+                <td><code class="inline">gpt-oss:120b</code></td>
+                <td>Largest; needs serious resources self-hosted</td>
+              </tr>
+              <tr>
+                <td><code class="inline">omni-moderation-latest</code></td>
+                <td><code class="inline">gpt-oss:20b</code></td>
+                <td>Compatibility alias only — not OpenAI parity</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="code">
+      <div class="wrap">
+        <h2 class="section-title">Get running in minutes</h2>
+        <p class="section-lead">Placeholder keys in docs are for local smoke only. Never commit real secrets.</p>
+        <div class="split">
+          <div>
+            <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">Local (dev)</h3>
+            <pre class="code-block">git clone https://github.com/AaronYang0628/ollama-moderation-gateway.git
+cd ollama-moderation-gateway
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+cp .env.example .env
+export APP_ENV=development
+export MODERATION_API_KEY=local-moderation-key
+uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
+          </div>
+          <div>
+            <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">curl</h3>
+            <pre class="code-block">curl http://localhost:8000/v1/moderations \
+  -H 'Authorization: Bearer local-moderation-key' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "model": "moderation-fast",
+    "input": "Text to screen"
+  }'</pre>
+            <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
+              Demo: <a href="https://ollama-moderation-gateway.onrender.com">onrender.com</a> —
+              free tier cold starts; bring your own keys for production.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="disclaimer">
+      <div class="wrap">
+        <div class="disclaimer">
+          <h2>Important: not equivalent to OpenAI omni-moderation</h2>
+          <p style="margin: 0; color: #f3cfc8;">
+            Scoring uses <strong>general-purpose chat models</strong>, not dedicated safety classifiers.
+          </p>
+          <ul>
+            <li><code class="inline">category_scores</code> are heuristic risk estimates (0–1), not calibrated probabilities.</li>
+            <li>Quality, score scale, and behavior differ from OpenAI <code class="inline">omni-moderation-latest</code>.</li>
+            <li>Evaluate on your languages and risk profile before production (<code class="inline">scripts/evaluate.py</code>).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="cta-band">
+          <h2>Ship moderation behind your own keys</h2>
+          <p>Clone the repo, set env, compose up — or poke the live demo first.</p>
+          <div class="cta-row" style="justify-content: center;">
+            <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">Star / fork on GitHub</a>
+            <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">Read the README</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div>
+        Ollama Moderation Gateway · Apache-2.0 · Independent implementation
+      </div>
+      <div>
+        <a href="https://github.com/AaronYang0628/ollama-moderation-gateway">GitHub</a>
+        ·
+        <a href="https://ollama-moderation-gateway.onrender.com">Demo</a>
+        ·
+        <a href="https://github.com/AaronYang0628/ollama-moderation-gateway/blob/main/LICENSE">License</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
