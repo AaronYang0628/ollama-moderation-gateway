@@ -138,4 +138,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     return app
 
 
+def run() -> None:
+    """CLI entrypoint: ``ollama-moderation-gateway`` (see ``[project.scripts]``)."""
+    import uvicorn
+
+    settings = get_settings()
+    uvicorn.run(
+        "app.main:app",
+        host=settings.app_host,
+        port=settings.app_port,
+    )
+
+
 app = create_app()

@@ -1,0 +1,96 @@
+# Release workflow
+# ---------------
+# On tag v*:
+#   1) build job always builds sdist/wheel and creates/updates a GitHub Release with assets.
+#   2) pypi job is separate and uses Trusted Publishing (OIDC). It will no-op / fail
+#      softly until you configure a Trusted Publisher on https://pypi.org for:
+#        Package name: ollama-moderation-gateway
+#        Owner: AaronYang0628
+#        Repository: ollama-moderation-gateway
+#        Workflow: release.yml
+#        Environment name: pypi
+#      One-time setup: PyPI → Your projects → Publishing → Add a new pending publisher.
+#      Until then, GitHub Release artifacts still publish successfully.
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install build tools
+        run: pip install build
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          NOTES_FILE=$(mktemp)
+          {
+            echo "## ${TAG}"
+            echo
+            if [ -f CHANGELOG.md ]; then
+              # Extract section for this version (e.g. ## [0.1.0] ...)
+              VER="${TAG#v}"
+              awk -v ver="$VER" '
+                BEGIN {p=0}
+                $0 ~ "^## \\[" ver "\\]" {p=1; next}
+                p && /^## / {exit}
+                p {print}
+              ' CHANGELOG.md
+            fi
+          } > "$NOTES_FILE"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --clobber
+          else
+            gh release create "$TAG" dist/* \
+              --title "$TAG" \
+              --notes-file "$NOTES_FILE"
+          fi
+
+  # Separate job: does not block GitHub Release success.
+  # Requires one-time Trusted Publisher setup on pypi.org (see header comment).
+  pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    continue-on-error: true
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

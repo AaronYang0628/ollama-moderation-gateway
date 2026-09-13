@@ -9,6 +9,7 @@ Plug it into anything that already calls `POST /v1/moderations` (OpenAI SDK, [su
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-green.svg)](pyproject.toml)
 [![Demo](https://img.shields.io/badge/demo-onrender-orange.svg)](https://ollama-moderation-gateway.onrender.com)
+[![Release](https://img.shields.io/github/v/release/AaronYang0628/ollama-moderation-gateway)](https://github.com/AaronYang0628/ollama-moderation-gateway/releases)
 
 | | |
 |---|---|
@@ -134,6 +135,28 @@ Native Ollama names also work. Default backend is Ollama Cloud (`https://ollama.
 | GET | `/readyz` | Ready when Ollama is reachable |
 
 Full env list: `.env.example`. Policy thresholds: `configs/policy.yaml`.
+
+
+## Install / Release
+
+Once published to PyPI:
+
+```bash
+pip install ollama-moderation-gateway
+ollama-moderation-gateway
+```
+
+Until then (or for the latest main):
+
+```bash
+pip install "git+https://github.com/AaronYang0628/ollama-moderation-gateway.git"
+# or a specific release tag:
+pip install "git+https://github.com/AaronYang0628/ollama-moderation-gateway.git@v0.1.0"
+```
+
+Binary wheels and source archives are attached to [GitHub Releases](https://github.com/AaronYang0628/ollama-moderation-gateway/releases).
+
+PyPI Trusted Publishing is optional: configure a pending publisher on [pypi.org](https://pypi.org) for package `ollama-moderation-gateway`, repo `AaronYang0628/ollama-moderation-gateway`, workflow `release.yml`, environment `pypi`. Until that is set, tag releases still upload assets to GitHub Releases only.
 
 ## License
 
