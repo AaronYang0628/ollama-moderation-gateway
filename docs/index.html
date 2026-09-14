@@ -27,6 +27,7 @@
       <nav class="nav-links" aria-label="Primary">
         <a class="hide-sm" href="#features">Why use it</a>
         <a class="hide-sm" href="#integrations">sub2api</a>
+        <a class="hide-sm" href="#deploy">Deploy</a>
         <a class="hide-sm" href="#code">Get started</a>
         <a class="hide-sm" href="#disclaimer">Note</a>
         <a href="https://github.com/AaronYang0628/ollama-moderation-gateway">GitHub</a>
@@ -59,13 +60,14 @@
           </p>
           <div class="cta-row">
             <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">View on GitHub</a>
+            <a class="btn btn-ghost" href="#deploy">Deploy</a>
             <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">Quick start</a>
             <a class="btn btn-ghost" href="https://ollama-moderation-gateway.onrender.com">Try demo</a>
           </div>
           <div class="meta-row">
             <span class="chip">Free Ollama audit</span>
             <span class="chip">Multi-key rotation</span>
-            <span class="chip">Lightweight</span>
+            <span class="chip">Helm / Kubernetes</span>
             <span class="chip">sub2api ready</span>
           </div>
         </div>
@@ -116,7 +118,7 @@ print(result.results[0].flagged)</pre>
           <article class="card">
             <div class="icon" aria-hidden="true">◈</div>
             <h3>Lightweight plug-in</h3>
-            <p>One small service. Docker Compose or a quick local start. No heavy platform, no custom client to rewrite.</p>
+            <p>One small service. Docker Compose, Helm on Kubernetes, or a quick local start. No heavy platform, no custom client to rewrite.</p>
           </article>
           <article class="card">
             <div class="icon" aria-hidden="true">☁</div>
@@ -202,6 +204,65 @@ print(result.results[0].flagged)</pre>
       </div>
     </section>
 
+    <section id="deploy">
+      <div class="wrap">
+        <h2 class="section-title">Deploy it for real</h2>
+        <p class="section-lead">
+          Docker Compose for a single host. Helm on Kubernetes for production.
+          The Render URL is a demo — it cold-starts and is not the production path.
+        </p>
+
+        <div class="grid-3">
+          <article class="card">
+            <div class="icon" aria-hidden="true">⎈</div>
+            <h3>Helm on Kubernetes</h3>
+            <p>Primary production path. Chart at <code class="inline">charts/ollama-moderation-gateway</code> (v0.1.0). Create the Secret out-of-band, then <code class="inline">helm upgrade --install</code>.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">▣</div>
+            <h3>Docker Compose</h3>
+            <p>Copy <code class="inline">.env.example</code> to <code class="inline">.env</code>, set keys, <code class="inline">docker compose up --build</code>. Port 8000. Fine for one machine.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">☁</div>
+            <h3>Render is a demo</h3>
+            <p>The onrender.com site is for poking the API. Free-tier cold starts. Use Helm (example host <code class="inline">moderation.llm.72602.space</code>) when it matters.</p>
+          </article>
+        </div>
+
+        <h3 style="margin: 1.75rem 0 0.85rem; font-size: 1.05rem;">Kubernetes with Helm</h3>
+        <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem;">
+          Prefer an existing Secret — the chart does not create one by default.
+          Image: <code class="inline">ghcr.io/aaronyang0628/ollama-moderation-gateway:v0.1.0</code> (GHCR; private packages may need <code class="inline">imagePullSecrets</code>).
+          Chart env includes example <code class="inline">HTTP_PROXY</code> / <code class="inline">HTTPS_PROXY</code> values for one cluster (<code class="inline">192.168.0.25:17890</code>) — clear or override them elsewhere.
+          Ingress defaults to nginx + cert-manager for <code class="inline">moderation.llm.72602.space</code>.
+        </p>
+        <pre class="code-block">kubectl create namespace moderation
+kubectl -n moderation create secret generic ollama-moderation-gateway \
+  --from-literal=OLLAMA_API_KEYS='key1,key2' \
+  --from-literal=MODERATION_API_KEYS='gw-key1,gw-key2'
+
+helm upgrade --install ollama-moderation-gateway ./charts/ollama-moderation-gateway \
+  -n moderation --create-namespace \
+  --set secrets.create=false \
+  --set secrets.existingSecret=ollama-moderation-gateway \
+  --set ingress.hosts[0].host=moderation.llm.72602.space \
+  --set ingress.tls[0].hosts[0]=moderation.llm.72602.space \
+  --set ingress.tls[0].secretName=moderation.llm.72602.space-tls</pre>
+        <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
+          Smoke: <code class="inline">curl https://moderation.llm.72602.space/health</code>
+          then <code class="inline">POST /v1/moderations</code> with a gateway Bearer key.
+          Chart notes:
+          <a href="https://github.com/AaronYang0628/ollama-moderation-gateway/blob/main/charts/ollama-moderation-gateway/README.md">charts/ollama-moderation-gateway/README.md</a>.
+        </p>
+
+        <h3 style="margin: 1.75rem 0 0.65rem; font-size: 1.05rem;">Docker Compose</h3>
+        <pre class="code-block">cp .env.example .env
+# Set MODERATION_API_KEY, OLLAMA_API_KEYS (for Cloud), APP_ENV=production
+docker compose up --build</pre>
+      </div>
+    </section>
+
     <section id="how">
       <div class="wrap">
         <h2 class="section-title">How it fits together</h2>
@@ -270,7 +331,7 @@ print(result.results[0].flagged)</pre>
     <section id="code">
       <div class="wrap">
         <h2 class="section-title">Get running in minutes</h2>
-        <p class="section-lead">Placeholder keys are for local smoke only. Never commit real secrets.</p>
+        <p class="section-lead">Placeholder keys are for local smoke only. Never commit real secrets. Production: <a href="#deploy">Helm on Kubernetes</a>.</p>
         <div class="split">
           <div>
             <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">Local</h3>
@@ -294,7 +355,8 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
   }'</pre>
             <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
               Demo: <a href="https://ollama-moderation-gateway.onrender.com">onrender.com</a> —
-              free tier may cold-start; use your own keys in production.
+              free tier may cold-start; demo only. Production host example:
+              <code class="inline">moderation.llm.72602.space</code> — see <a href="#deploy">Deploy</a>.
             </p>
           </div>
         </div>
@@ -318,7 +380,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
       <div class="wrap">
         <div class="cta-band">
           <h2>Free Ollama moderation, ready to plug in</h2>
-          <p>Clone it, point sub2api or your SDK at it, rotate keys — or poke the live demo first.</p>
+          <p>Helm it onto Kubernetes, point sub2api or your SDK at it, rotate keys — or poke the live demo first.</p>
           <div class="cta-row" style="justify-content: center;">
             <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">Star / fork on GitHub</a>
             <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">Read the README</a>

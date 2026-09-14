@@ -27,6 +27,7 @@
       <nav class="nav-links" aria-label="主导航">
         <a class="hide-sm" href="#features">为什么用</a>
         <a class="hide-sm" href="#integrations">对接 sub2api</a>
+        <a class="hide-sm" href="#deploy">部署</a>
         <a class="hide-sm" href="#code">快速上手</a>
         <a class="hide-sm" href="#disclaimer">说明</a>
         <a href="https://github.com/AaronYang0628/ollama-moderation-gateway">GitHub</a>
@@ -58,13 +59,14 @@
           </p>
           <div class="cta-row">
             <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">查看 GitHub</a>
+            <a class="btn btn-ghost" href="#deploy">部署</a>
             <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">快速开始</a>
             <a class="btn btn-ghost" href="https://ollama-moderation-gateway.onrender.com">试用演示</a>
           </div>
           <div class="meta-row">
             <span class="chip">免费 Ollama 审核</span>
             <span class="chip">多 Key 轮换</span>
-            <span class="chip">轻量</span>
+            <span class="chip">Helm / Kubernetes</span>
             <span class="chip">对接 sub2api</span>
           </div>
         </div>
@@ -115,7 +117,7 @@ print(result.results[0].flagged)</pre>
           <article class="card">
             <div class="icon" aria-hidden="true">◈</div>
             <h3>轻量即插即用</h3>
-            <p>一个小服务搞定。Docker Compose 或本地几步启动，不用重写客户端，也不用上重型平台。</p>
+            <p>一个小服务搞定。Docker Compose、Kubernetes Helm，或本地几步启动，不用重写客户端，也不用上重型平台。</p>
           </article>
           <article class="card">
             <div class="icon" aria-hidden="true">☁</div>
@@ -200,6 +202,65 @@ print(result.results[0].flagged)</pre>
       </div>
     </section>
 
+    <section id="deploy">
+      <div class="wrap">
+        <h2 class="section-title">部署</h2>
+        <p class="section-lead">
+          单机用 Docker Compose。生产走 Kubernetes + Helm。
+          Render 上的地址只是演示 —— 会冷启动，不是生产路径。
+        </p>
+
+        <div class="grid-3">
+          <article class="card">
+            <div class="icon" aria-hidden="true">⎈</div>
+            <h3>Helm 部署到 Kubernetes</h3>
+            <p>生产主路径。Chart 在 <code class="inline">charts/ollama-moderation-gateway</code>（v0.1.0）。先在集群外创建 Secret，再 <code class="inline">helm upgrade --install</code>。</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">▣</div>
+            <h3>Docker Compose</h3>
+            <p>把 <code class="inline">.env.example</code> 复制为 <code class="inline">.env</code>，填密钥，<code class="inline">docker compose up --build</code>。端口 8000。适合单机。</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">☁</div>
+            <h3>Render 只是演示</h3>
+            <p>onrender.com 用来试接口。免费层会冷启动。当真用时走 Helm（示例域名 <code class="inline">moderation.llm.72602.space</code>）。</p>
+          </article>
+        </div>
+
+        <h3 style="margin: 1.75rem 0 0.85rem; font-size: 1.05rem;">Kubernetes + Helm</h3>
+        <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem;">
+          建议在 Chart 外创建 Secret —— 默认 <code class="inline">secrets.create: false</code>，此时必须提供 <code class="inline">existingSecret</code>。
+          镜像：<code class="inline">ghcr.io/aaronyang0628/ollama-moderation-gateway:v0.1.0</code>（GHCR；私有包可能需要 <code class="inline">imagePullSecrets</code>）。
+          Chart 的 <code class="inline">HTTP_PROXY</code> / <code class="inline">HTTPS_PROXY</code> 默认指向某个集群的 <code class="inline">192.168.0.25:17890</code>，换集群请清空或覆盖。
+          Ingress 默认 nginx + cert-manager，主机名 <code class="inline">moderation.llm.72602.space</code>。
+        </p>
+        <pre class="code-block">kubectl create namespace moderation
+kubectl -n moderation create secret generic ollama-moderation-gateway \
+  --from-literal=OLLAMA_API_KEYS='key1,key2' \
+  --from-literal=MODERATION_API_KEYS='gw-key1,gw-key2'
+
+helm upgrade --install ollama-moderation-gateway ./charts/ollama-moderation-gateway \
+  -n moderation --create-namespace \
+  --set secrets.create=false \
+  --set secrets.existingSecret=ollama-moderation-gateway \
+  --set ingress.hosts[0].host=moderation.llm.72602.space \
+  --set ingress.tls[0].hosts[0]=moderation.llm.72602.space \
+  --set ingress.tls[0].secretName=moderation.llm.72602.space-tls</pre>
+        <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
+          冒烟：<code class="inline">curl https://moderation.llm.72602.space/health</code>，
+          再带网关 Bearer Key <code class="inline">POST /v1/moderations</code>。
+          Chart 说明：
+          <a href="https://github.com/AaronYang0628/ollama-moderation-gateway/blob/main/charts/ollama-moderation-gateway/README.md">charts/ollama-moderation-gateway/README.md</a>。
+        </p>
+
+        <h3 style="margin: 1.75rem 0 0.65rem; font-size: 1.05rem;">Docker Compose</h3>
+        <pre class="code-block">cp .env.example .env
+# 设置 MODERATION_API_KEY、OLLAMA_API_KEYS（Cloud）以及 APP_ENV=production
+docker compose up --build</pre>
+      </div>
+    </section>
+
     <section id="how">
       <div class="wrap">
         <h2 class="section-title">怎么接上</h2>
@@ -268,7 +329,7 @@ print(result.results[0].flagged)</pre>
     <section id="code">
       <div class="wrap">
         <h2 class="section-title">几分钟跑起来</h2>
-        <p class="section-lead">文档里的密钥只是本地冒烟占位。切勿提交真实密钥。</p>
+        <p class="section-lead">文档里的密钥只是本地冒烟占位。切勿提交真实密钥。生产请看 <a href="#deploy">部署</a>（Helm）。</p>
         <div class="split">
           <div>
             <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">本地</h3>
@@ -292,7 +353,8 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
   }'</pre>
             <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
               演示：<a href="https://ollama-moderation-gateway.onrender.com">onrender.com</a> —
-              免费层可能冷启动；生产请用自有密钥与部署。
+              免费层可能冷启动，仅供试用。生产示例主机：
+              <code class="inline">moderation.llm.72602.space</code> —— 见 <a href="#deploy">部署</a>。
             </p>
           </div>
         </div>
@@ -317,7 +379,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
       <div class="wrap">
         <div class="cta-band">
           <h2>免费的 Ollama 审核，随时可接</h2>
-          <p>克隆仓库，把 sub2api 或 SDK 指过来，配好多 Key —— 或者先点开在线演示。</p>
+          <p>用 Helm 部署到 Kubernetes，把 sub2api 或 SDK 指过来，配好多 Key —— 或者先点开在线演示。</p>
           <div class="cta-row" style="justify-content: center;">
             <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">在 GitHub 上 Star / Fork</a>
             <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">阅读 README</a>

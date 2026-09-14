@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Helm chart** (`charts/ollama-moderation-gateway`, version 0.1.0 / appVersion 0.1.0): Kubernetes install with ConfigMap env, out-of-band Secret (default `secrets.create: false`; `existingSecret` required otherwise), nginx Ingress, probes on `/health` and `/readyz`, and GHCR image `ghcr.io/aaronyang0628/ollama-moderation-gateway:v0.1.0`. Images are published on `main` and version tags via `.github/workflows/container.yml`. Chart-managed secrets (`secrets.create: true`) are for local / non-prod only.
+- **Deploy docs**: README Deploy section, chart README, and EN/ZH GitHub Pages `#deploy` covering Helm as the production path (example host `moderation.llm.72602.space`). Chart `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` defaults are documented as example cluster values. Render remains a demo (cold starts).
+
 ## [0.1.0] - 2026-09-13
 
 ### Added
