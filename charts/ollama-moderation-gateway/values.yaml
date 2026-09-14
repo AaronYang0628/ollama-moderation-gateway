@@ -45,9 +45,9 @@ env:
   OLLAMA_READ_TIMEOUT_SECONDS: "180"
   REQUEST_TIMEOUT_SECONDS: "190"
   KEY_COOLDOWN_SECONDS: "30"
-  HTTP_PROXY: http://192.168.0.25:17890
-  HTTPS_PROXY: http://192.168.0.25:17890
-  NO_PROXY: 127.0.0.1,localhost,.svc,.cluster.local,10.42.0.0/16,10.43.0.0/16,192.168.0.25
+  HTTP_PROXY: ""
+  HTTPS_PROXY: ""
+  NO_PROXY: "127.0.0.1,localhost,.svc,.cluster.local"
   LOG_LEVEL: INFO
   LOG_RAW_INPUT: "false"
   ENABLE_DOCS: "false"
@@ -76,14 +76,14 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
   hosts:
-    - host: moderation.llm.72602.space
+    - host: moderation.example.com
       paths:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: moderation.llm.72602.space-tls
+    - secretName: moderation.example.com-tls
       hosts:
-        - moderation.llm.72602.space
+        - moderation.example.com
 
 resources:
   requests:

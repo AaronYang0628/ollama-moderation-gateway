@@ -20,9 +20,9 @@ helm upgrade --install ollama-moderation-gateway ./charts/ollama-moderation-gate
   -n moderation --create-namespace \
   --set secrets.create=false \
   --set secrets.existingSecret=ollama-moderation-gateway \
-  --set ingress.hosts[0].host=moderation.llm.72602.space \
-  --set ingress.tls[0].hosts[0]=moderation.llm.72602.space \
-  --set ingress.tls[0].secretName=moderation.llm.72602.space-tls
+  --set ingress.hosts[0].host=moderation.example.com \
+  --set ingress.tls[0].hosts[0]=moderation.example.com \
+  --set ingress.tls[0].secretName=moderation.example.com-tls
 ```
 
 Requires Kubernetes `>= 1.25`.
@@ -35,7 +35,7 @@ Images are published to GHCR on `main` and version tags by [`.github/workflows/c
 
 ### Cluster proxy defaults
 
-`values.yaml` `env` includes `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` pointing at `192.168.0.25:17890`. Those are **example cluster values**, not universal defaults. On any other cluster, clear or override them:
+`HTTP_PROXY` / `HTTPS_PROXY` default to empty. Set them only if your cluster needs egress proxy (prefer a private values overlay; do not commit real proxy endpoints):
 
 ```bash
 --set env.HTTP_PROXY= \
@@ -50,9 +50,9 @@ Images are published to GHCR on `main` and version tags by [`.github/workflows/c
 Example production host (chart ingress default):
 
 ```bash
-curl https://moderation.llm.72602.space/health
+curl https://moderation.example.com/health
 
-curl https://moderation.llm.72602.space/v1/moderations \
+curl https://moderation.example.com/v1/moderations \
   -H 'Authorization: Bearer gw-key1' \
   -H 'Content-Type: application/json' \
   -d '{"model":"moderation-fast","input":"Text to screen"}'
@@ -78,7 +78,7 @@ Service is ClusterIP port **8000**. Liveness is `GET /health`; readiness is `GET
 | `env.OLLAMA_BASE_URL` | `https://ollama.com` | Self-hosted: your Ollama URL |
 | `env.DEFAULT_MODERATION_MODEL` | `moderation-fast` | |
 | `env.ENABLE_DOCS` | `"false"` | |
-| `env.HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` | example `192.168.0.25:17890` | **Cluster-specific examples — override elsewhere** |
+| `env.HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` | empty / localhost defaults | Set only if your cluster needs egress proxy; keep real values out of git |
 | `env.LOG_LEVEL` | `INFO` | |
 | `env.LOG_RAW_INPUT` | `"false"` | Keep false in production |
 | `extraEnv` / `extraEnvFrom` | `[]` | Extra container env |
@@ -87,8 +87,8 @@ Service is ClusterIP port **8000**. Liveness is `GET /health`; readiness is `GET
 | `secrets.stringData.*` | empty | Used only if `secrets.create: true` |
 | `ingress.enabled` | `true` | |
 | `ingress.className` | `nginx` | |
-| `ingress.hosts[0].host` | `moderation.llm.72602.space` | Override for your cluster |
-| `ingress.tls[0].secretName` | `moderation.llm.72602.space-tls` | cert-manager / your TLS secret |
+| `ingress.hosts[0].host` | `moderation.example.com` | **Placeholder** — set your real host via private values / `--set` |
+| `ingress.tls[0].secretName` | `moderation.example.com-tls` | cert-manager / your TLS secret |
 | `ingress.annotations` | cert-manager `lets-encrypt`; nginx body 5m; connect 30s; read/send 300s | |
 | `resources.requests` | cpu `100m`, memory `256Mi` | |
 | `resources.limits` | cpu `1`, memory `1Gi` | |

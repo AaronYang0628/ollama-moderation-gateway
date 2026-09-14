@@ -226,7 +226,7 @@ print(result.results[0].flagged)</pre>
           <article class="card">
             <div class="icon" aria-hidden="true">☁</div>
             <h3>Render is a demo</h3>
-            <p>The onrender.com site is for poking the API. Free-tier cold starts. Use Helm (example host <code class="inline">moderation.llm.72602.space</code>) when it matters.</p>
+            <p>The onrender.com site is for poking the API. Free-tier cold starts. Use Helm (example host <code class="inline">moderation.example.com</code>) when it matters.</p>
           </article>
         </div>
 
@@ -234,8 +234,8 @@ print(result.results[0].flagged)</pre>
         <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem;">
           Prefer an existing Secret — the chart does not create one by default.
           Image: <code class="inline">ghcr.io/aaronyang0628/ollama-moderation-gateway:v0.1.0</code> (GHCR; private packages may need <code class="inline">imagePullSecrets</code>).
-          Chart env includes example <code class="inline">HTTP_PROXY</code> / <code class="inline">HTTPS_PROXY</code> values for one cluster (<code class="inline">192.168.0.25:17890</code>) — clear or override them elsewhere.
-          Ingress defaults to nginx + cert-manager for <code class="inline">moderation.llm.72602.space</code>.
+          Proxy env vars default empty — set only if your cluster needs egress proxy (keep real endpoints out of git).
+          Ingress defaults to nginx + cert-manager with placeholder host <code class="inline">moderation.example.com</code> (override to yours).
         </p>
         <pre class="code-block">kubectl create namespace moderation
 kubectl -n moderation create secret generic ollama-moderation-gateway \
@@ -246,11 +246,11 @@ helm upgrade --install ollama-moderation-gateway ./charts/ollama-moderation-gate
   -n moderation --create-namespace \
   --set secrets.create=false \
   --set secrets.existingSecret=ollama-moderation-gateway \
-  --set ingress.hosts[0].host=moderation.llm.72602.space \
-  --set ingress.tls[0].hosts[0]=moderation.llm.72602.space \
-  --set ingress.tls[0].secretName=moderation.llm.72602.space-tls</pre>
+  --set ingress.hosts[0].host=moderation.example.com \
+  --set ingress.tls[0].hosts[0]=moderation.example.com \
+  --set ingress.tls[0].secretName=moderation.example.com-tls</pre>
         <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
-          Smoke: <code class="inline">curl https://moderation.llm.72602.space/health</code>
+          Smoke: <code class="inline">curl https://moderation.example.com/health</code>
           then <code class="inline">POST /v1/moderations</code> with a gateway Bearer key.
           Chart notes:
           <a href="https://github.com/AaronYang0628/ollama-moderation-gateway/blob/main/charts/ollama-moderation-gateway/README.md">charts/ollama-moderation-gateway/README.md</a>.
@@ -356,7 +356,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
             <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
               Demo: <a href="https://ollama-moderation-gateway.onrender.com">onrender.com</a> —
               free tier may cold-start; demo only. Production host example:
-              <code class="inline">moderation.llm.72602.space</code> — see <a href="#deploy">Deploy</a>.
+              <code class="inline">moderation.example.com</code> — see <a href="#deploy">Deploy</a>.
             </p>
           </div>
         </div>

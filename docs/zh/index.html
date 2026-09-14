@@ -224,7 +224,7 @@ print(result.results[0].flagged)</pre>
           <article class="card">
             <div class="icon" aria-hidden="true">☁</div>
             <h3>Render 只是演示</h3>
-            <p>onrender.com 用来试接口。免费层会冷启动。当真用时走 Helm（示例域名 <code class="inline">moderation.llm.72602.space</code>）。</p>
+            <p>onrender.com 用来试接口。免费层会冷启动。当真用时走 Helm（示例域名 <code class="inline">moderation.example.com</code>）。</p>
           </article>
         </div>
 
@@ -232,8 +232,8 @@ print(result.results[0].flagged)</pre>
         <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem;">
           建议在 Chart 外创建 Secret —— 默认 <code class="inline">secrets.create: false</code>，此时必须提供 <code class="inline">existingSecret</code>。
           镜像：<code class="inline">ghcr.io/aaronyang0628/ollama-moderation-gateway:v0.1.0</code>（GHCR；私有包可能需要 <code class="inline">imagePullSecrets</code>）。
-          Chart 的 <code class="inline">HTTP_PROXY</code> / <code class="inline">HTTPS_PROXY</code> 默认指向某个集群的 <code class="inline">192.168.0.25:17890</code>，换集群请清空或覆盖。
-          Ingress 默认 nginx + cert-manager，主机名 <code class="inline">moderation.llm.72602.space</code>。
+          代理相关环境变量默认为空；仅在集群需要出口代理时再设置（真实代理地址不要进公开仓库）。
+          Ingress 默认 nginx + cert-manager，主机名为占位符 <code class="inline">moderation.example.com</code>（请改成你自己的）。
         </p>
         <pre class="code-block">kubectl create namespace moderation
 kubectl -n moderation create secret generic ollama-moderation-gateway \
@@ -244,11 +244,11 @@ helm upgrade --install ollama-moderation-gateway ./charts/ollama-moderation-gate
   -n moderation --create-namespace \
   --set secrets.create=false \
   --set secrets.existingSecret=ollama-moderation-gateway \
-  --set ingress.hosts[0].host=moderation.llm.72602.space \
-  --set ingress.tls[0].hosts[0]=moderation.llm.72602.space \
-  --set ingress.tls[0].secretName=moderation.llm.72602.space-tls</pre>
+  --set ingress.hosts[0].host=moderation.example.com \
+  --set ingress.tls[0].hosts[0]=moderation.example.com \
+  --set ingress.tls[0].secretName=moderation.example.com-tls</pre>
         <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
-          冒烟：<code class="inline">curl https://moderation.llm.72602.space/health</code>，
+          冒烟：<code class="inline">curl https://moderation.example.com/health</code>，
           再带网关 Bearer Key <code class="inline">POST /v1/moderations</code>。
           Chart 说明：
           <a href="https://github.com/AaronYang0628/ollama-moderation-gateway/blob/main/charts/ollama-moderation-gateway/README.md">charts/ollama-moderation-gateway/README.md</a>。
@@ -354,7 +354,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
             <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
               演示：<a href="https://ollama-moderation-gateway.onrender.com">onrender.com</a> —
               免费层可能冷启动，仅供试用。生产示例主机：
-              <code class="inline">moderation.llm.72602.space</code> —— 见 <a href="#deploy">部署</a>。
+              <code class="inline">moderation.example.com</code> —— 见 <a href="#deploy">部署</a>。
             </p>
           </div>
         </div>

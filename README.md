@@ -110,8 +110,8 @@ This is the production path. Chart version **0.1.0**, appVersion **0.1.0**.
 
 - **Image:** `ghcr.io/aaronyang0628/ollama-moderation-gateway:v0.1.0` (GHCR; published on `main` and version tags by [`.github/workflows/container.yml`](.github/workflows/container.yml)). Private GHCR packages need `imagePullSecrets`.
 - **Service:** ClusterIP port **8000**. Liveness `GET /health`, readiness `GET /readyz`.
-- **Ingress defaults:** enabled, class `nginx`, host `moderation.llm.72602.space`, TLS secret `moderation.llm.72602.space-tls`, cert-manager cluster-issuer `lets-encrypt`, nginx read/send timeouts 300s.
-- **Proxy note:** chart `env` defaults include `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` pointing at `192.168.0.25:17890`. Those are **example cluster values**. On any other cluster, clear or override them (`--set env.HTTP_PROXY=` / `HTTPS_PROXY=` / `NO_PROXY=`, or a values file).
+- **Ingress defaults:** enabled, class `nginx`, placeholder host `moderation.example.com` (replace with **your** hostname; do not commit real prod domains), TLS secret `moderation.example.com-tls`, cert-manager cluster-issuer `lets-encrypt`, nginx read/send timeouts 300s.
+- **Proxy note:** `HTTP_PROXY` / `HTTPS_PROXY` default empty. Set them only if your cluster needs an egress proxy (keep real proxy addresses in a private values file / sealed secret — not in git).
 
 ```bash
 kubectl create namespace moderation
@@ -123,21 +123,21 @@ helm upgrade --install ollama-moderation-gateway ./charts/ollama-moderation-gate
   -n moderation --create-namespace \
   --set secrets.create=false \
   --set secrets.existingSecret=ollama-moderation-gateway \
-  --set ingress.hosts[0].host=moderation.llm.72602.space \
-  --set ingress.tls[0].hosts[0]=moderation.llm.72602.space \
-  --set ingress.tls[0].secretName=moderation.llm.72602.space-tls
+  --set ingress.hosts[0].host=moderation.example.com \
+  --set ingress.tls[0].hosts[0]=moderation.example.com \
+  --set ingress.tls[0].secretName=moderation.example.com-tls
 ```
 
 Secret keys the chart expects: `OLLAMA_API_KEYS`, `OLLAMA_API_KEY`, `MODERATION_API_KEYS`, `MODERATION_API_KEY`. `secrets.create: true` is **only for local / non-prod** — do not put real keys in Git or in committed values files.
 
-Override the ingress host (and TLS secret) if you are not using `moderation.llm.72602.space`.
+Always override the ingress host and TLS secret to your own domain via `--set` or a **private** values file (never commit production hostnames).
 
 **Smoke** (example production host):
 
 ```bash
-curl https://moderation.llm.72602.space/health
+curl https://moderation.example.com/health
 
-curl https://moderation.llm.72602.space/v1/moderations \
+curl https://moderation.example.com/v1/moderations \
   -H 'Authorization: Bearer gw-key1' \
   -H 'Content-Type: application/json' \
   -d '{"model":"moderation-fast","input":"Text to screen"}'
