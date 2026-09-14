@@ -1,0 +1,7 @@
+apiVersion: v2
+name: ollama-moderation-gateway
+description: OpenAI-compatible moderation gateway backed by Ollama
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+kubeVersion: ">=1.25.0-0"

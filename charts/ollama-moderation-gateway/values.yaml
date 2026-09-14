@@ -1,0 +1,116 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/aaronyang0628/ollama-moderation-gateway
+  tag: v0.1.0
+  digest: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+terminationGracePeriodSeconds: 30
+
+service:
+  type: ClusterIP
+  port: 8000
+
+# Non-sensitive application configuration. Keep API keys in secrets instead.
+env:
+  APP_ENV: production
+  APP_HOST: 0.0.0.0
+  APP_PORT: "8000"
+  OLLAMA_BASE_URL: https://ollama.com
+  DEFAULT_MODERATION_MODEL: moderation-fast
+  POLICY_PATH: configs/policy.yaml
+  OLLAMA_CONNECT_TIMEOUT_SECONDS: "5"
+  OLLAMA_READ_TIMEOUT_SECONDS: "180"
+  REQUEST_TIMEOUT_SECONDS: "190"
+  KEY_COOLDOWN_SECONDS: "30"
+  HTTP_PROXY: http://192.168.0.25:17890
+  HTTPS_PROXY: http://192.168.0.25:17890
+  NO_PROXY: 127.0.0.1,localhost,.svc,.cluster.local,10.42.0.0/16,10.43.0.0/16,192.168.0.25
+  LOG_LEVEL: INFO
+  LOG_RAW_INPUT: "false"
+  ENABLE_DOCS: "false"
+
+extraEnv: []
+extraEnvFrom: []
+
+# Production should use an existing Secret created outside Git. The optional
+# chart-managed Secret is intended for local/non-production installs only.
+secrets:
+  create: false
+  existingSecret: ollama-moderation-gateway
+  stringData:
+    OLLAMA_API_KEYS: ""
+    OLLAMA_API_KEY: ""
+    MODERATION_API_KEYS: ""
+    MODERATION_API_KEY: ""
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: lets-encrypt
+    nginx.ingress.kubernetes.io/proxy-body-size: 5m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+  hosts:
+    - host: moderation.llm.72602.space
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: moderation.llm.72602.space-tls
+      hosts:
+        - moderation.llm.72602.space
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 15
+  timeoutSeconds: 10
+  failureThreshold: 3
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
