@@ -2,7 +2,7 @@
 
 Kubernetes install for the Ollama Moderation Gateway. Chart version **0.1.0**, appVersion **0.1.0**.
 
-This is the **production** path. Docker Compose is fine on a single host; the [Render demo](https://ollama-moderation-gateway.onrender.com) is demo-only (cold starts).
+This is the **production** path. Docker Compose is fine on a single host; an optional Render demo may sleep / cold-start — prefer Compose or this Helm chart for anything real.
 
 Product docs: [README · Deploy](../../README.md#deploy) · [Pages · Deploy](https://aaronyang0628.github.io/ollama-moderation-gateway/#deploy).
 

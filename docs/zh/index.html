@@ -36,7 +36,7 @@
           <span class="lang-sep" aria-hidden="true">·</span>
           <span class="lang-current" aria-current="page">中文</span>
         </span>
-        <a class="btn btn-primary" href="https://ollama-moderation-gateway.onrender.com">在线演示</a>
+        <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">快速开始</a>
       </nav>
     </div>
   </header>
@@ -45,7 +45,7 @@
     <section class="hero">
       <div class="wrap hero-grid">
         <div>
-          <div class="eyebrow">免费 · Ollama AI · 兼容 OpenAI Moderations</div>
+          <div class="eyebrow">免费 · pip install · 兼容 OpenAI Moderations</div>
           <h1>免费的 AI 内容审核，即插即用</h1>
           <p class="hero-lead">
             用 Ollama（云端或自建）做内容审计 / 审核，对外仍是熟悉的
@@ -58,10 +58,10 @@
             轻量多 Key 轮换 · 质量<strong>不等同于</strong> OpenAI 官方审核模型。
           </p>
           <div class="cta-row">
-            <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">查看 GitHub</a>
-            <a class="btn btn-ghost" href="#deploy">部署</a>
-            <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">快速开始</a>
-            <a class="btn btn-ghost" href="https://ollama-moderation-gateway.onrender.com">试用演示</a>
+            <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">快速开始</a>
+            <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway">GitHub</a>
+            <a class="btn btn-ghost" href="#deploy">Helm / 部署</a>
+            <a class="btn btn-ghost" href="https://ollama-moderation-gateway.onrender.com" title="可选；免费层可能休眠/冷启动">可选演示</a>
           </div>
           <div class="meta-row">
             <span class="chip">免费 Ollama 审核</span>
@@ -156,9 +156,10 @@ print(result.results[0].flagged)</pre>
             <div>
               <h3>Base URL — 不要带尾部 <code class="inline">/v1</code></h3>
               <p>
-                填
-                <code class="inline">https://ollama-moderation-gateway.onrender.com</code>，
-                <strong>不要</strong>再加 <code class="inline">/v1</code>。
+                填你自己的网关：
+                <code class="inline">http://localhost:8000</code>（本地）或
+                <code class="inline">https://moderation.example.com</code>（自建）——
+                <strong>不要</strong>再加尾部 <code class="inline">/v1</code>。
                 sub2api 会自己拼 <code class="inline">/v1/moderations</code>；多写一层路径会 404。
               </p>
             </div>
@@ -180,7 +181,7 @@ print(result.results[0].flagged)</pre>
               <p>
                 填网关的 <code class="inline">MODERATION_API_KEY</code>，
                 <strong>不是</strong> Ollama Cloud 密钥。
-                公开演示站可能需要你自行部署并配置密钥。
+                使用你在自己部署上配置的密钥。
               </p>
             </div>
           </div>
@@ -189,7 +190,7 @@ print(result.results[0].flagged)</pre>
             <div>
               <h3>把 <code class="inline">timeout_ms</code> 设为 <code class="inline">30000</code></h3>
               <p>
-                默认 <code class="inline">3000</code> 对云端模型延迟和免费层冷启动太短。
+                默认 <code class="inline">3000</code> 对云端模型延迟太短。
               </p>
             </div>
           </div>
@@ -206,8 +207,8 @@ print(result.results[0].flagged)</pre>
       <div class="wrap">
         <h2 class="section-title">部署</h2>
         <p class="section-lead">
-          单机用 Docker Compose。生产走 Kubernetes + Helm。
-          Render 上的地址只是演示 —— 会冷启动，不是生产路径。
+          主路径：<code class="inline">pip install</code>、Docker Compose 或 Helm。
+          Render 演示可选，可能休眠/冷启动 —— 别当主 CTA。
         </p>
 
         <div class="grid-3">
@@ -223,8 +224,8 @@ print(result.results[0].flagged)</pre>
           </article>
           <article class="card">
             <div class="icon" aria-hidden="true">☁</div>
-            <h3>Render 只是演示</h3>
-            <p>onrender.com 用来试接口。免费层会冷启动。当真用时走 Helm（示例域名 <code class="inline">moderation.example.com</code>）。</p>
+            <h3>可选演示</h3>
+            <p>onrender.com 或许能试接口，但常会休眠/超时。优先本地或 Helm（示例域名 <code class="inline">moderation.example.com</code>）。</p>
           </article>
         </div>
 
@@ -329,18 +330,20 @@ docker compose up --build</pre>
     <section id="code">
       <div class="wrap">
         <h2 class="section-title">几分钟跑起来</h2>
-        <p class="section-lead">文档里的密钥只是本地冒烟占位。切勿提交真实密钥。生产请看 <a href="#deploy">部署</a>（Helm）。</p>
+        <p class="section-lead">优先 <code class="inline">pip install ollama-moderation-gateway</code>。文档密钥只是本地冒烟占位。生产请看 <a href="#deploy">部署</a>（Helm）。</p>
         <div class="split">
           <div>
-            <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">本地</h3>
-            <pre class="code-block">git clone https://github.com/AaronYang0628/ollama-moderation-gateway.git
-cd ollama-moderation-gateway
-python -m venv .venv &amp;&amp; source .venv/bin/activate
-pip install -e ".[dev]"
-cp .env.example .env
+            <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">pip（PyPI）</h3>
+            <pre class="code-block">pip install ollama-moderation-gateway
 export APP_ENV=development
 export MODERATION_API_KEY=local-moderation-key
-uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
+# Cloud: export OLLAMA_API_KEYS=...
+# 自建: export OLLAMA_BASE_URL=http://127.0.0.1:11434
+ollama-moderation-gateway</pre>
+            <p style="margin: 0.75rem 0 0; color: var(--muted); font-size: 0.88rem;">
+              源码开发：<code class="inline">pip install -e ".[dev]"</code>，再
+              <code class="inline">uvicorn app.main:app --host 0.0.0.0 --port 8000</code>。
+            </p>
           </div>
           <div>
             <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">curl</h3>
@@ -352,8 +355,9 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
     "input": "待审核文本"
   }'</pre>
             <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
-              演示：<a href="https://ollama-moderation-gateway.onrender.com">onrender.com</a> —
-              免费层可能冷启动，仅供试用。生产示例主机：
+              主路径：上面的本地 curl。可选演示
+              <a href="https://ollama-moderation-gateway.onrender.com">onrender.com</a>
+              可能休眠/冷启动。生产示例：
               <code class="inline">moderation.example.com</code> —— 见 <a href="#deploy">部署</a>。
             </p>
           </div>
@@ -379,10 +383,11 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
       <div class="wrap">
         <div class="cta-band">
           <h2>免费的 Ollama 审核，随时可接</h2>
-          <p>用 Helm 部署到 Kubernetes，把 sub2api 或 SDK 指过来，配好多 Key —— 或者先点开在线演示。</p>
+          <p>pip install、Compose 或 Helm —— 再把 sub2api / SDK 指过来。</p>
           <div class="cta-row" style="justify-content: center;">
             <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">在 GitHub 上 Star / Fork</a>
-            <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">阅读 README</a>
+            <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">快速开始</a>
+            <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway/blob/main/docs/PROMOTE.md">推广文案</a>
           </div>
         </div>
       </div>
@@ -399,7 +404,9 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
         ·
         <a href="https://github.com/AaronYang0628/ollama-moderation-gateway">GitHub</a>
         ·
-        <a href="https://ollama-moderation-gateway.onrender.com">演示</a>
+        <a href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">快速开始</a>
+        ·
+        <a href="https://ollama-moderation-gateway.onrender.com" title="可能休眠">可选演示</a>
         ·
         <a href="https://github.com/AaronYang0628/ollama-moderation-gateway/blob/main/LICENSE">许可</a>
       </div>

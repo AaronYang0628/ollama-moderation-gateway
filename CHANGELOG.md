@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Docs / conversion polish for stars**: README leads with live PyPI `pip install ollama-moderation-gateway`, 60s quick start (pip or Compose + curl), comparison table, Mermaid architecture, and Share link to `docs/PROMOTE.md`. Demoted sleeping Render demo from primary CTA/badge; sub2api Base URL examples use `localhost` / `moderation.example.com`. EN + ZH Pages aligned (PyPI first; demo secondary with cold-start note). Community post templates in `docs/PROMOTE.md` (ethical promo; no fake stars).
+
 ### Added
 
 - **Helm chart** (`charts/ollama-moderation-gateway`, version 0.1.0 / appVersion 0.1.0): Kubernetes install with ConfigMap env, out-of-band Secret (default `secrets.create: false`; `existingSecret` required otherwise), nginx Ingress, probes on `/health` and `/readyz`, and GHCR image `ghcr.io/aaronyang0628/ollama-moderation-gateway:v0.1.0`. Images are published on `main` and version tags via `.github/workflows/container.yml`. Chart-managed secrets (`secrets.create: true`) are for local / non-prod only.

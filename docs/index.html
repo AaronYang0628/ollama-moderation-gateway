@@ -36,7 +36,7 @@
           <span class="lang-sep" aria-hidden="true">·</span>
           <a href="zh/">中文</a>
         </span>
-        <a class="btn btn-primary" href="https://ollama-moderation-gateway.onrender.com">Live demo</a>
+        <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">Quick start</a>
       </nav>
     </div>
   </header>
@@ -45,7 +45,7 @@
     <section class="hero">
       <div class="wrap hero-grid">
         <div>
-          <div class="eyebrow">Free · Ollama AI · OpenAI Moderations compatible</div>
+          <div class="eyebrow">Free · pip install · OpenAI Moderations compatible</div>
           <h1>Free AI content moderation that plugs right in</h1>
           <p class="hero-lead">
             Screen text with Ollama — cloud or your own machine — through the same
@@ -59,10 +59,10 @@
             <a href="zh/">完整中文页面 →</a>
           </p>
           <div class="cta-row">
-            <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">View on GitHub</a>
-            <a class="btn btn-ghost" href="#deploy">Deploy</a>
-            <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">Quick start</a>
-            <a class="btn btn-ghost" href="https://ollama-moderation-gateway.onrender.com">Try demo</a>
+            <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">Quick start</a>
+            <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway">GitHub</a>
+            <a class="btn btn-ghost" href="#deploy">Helm / Deploy</a>
+            <a class="btn btn-ghost" href="https://ollama-moderation-gateway.onrender.com" title="Optional; free tier may sleep / cold-start">Optional demo</a>
           </div>
           <div class="meta-row">
             <span class="chip">Free Ollama audit</span>
@@ -157,9 +157,10 @@ print(result.results[0].flagged)</pre>
             <div>
               <h3>Base URL — no trailing <code class="inline">/v1</code></h3>
               <p>
-                Use
-                <code class="inline">https://ollama-moderation-gateway.onrender.com</code>
-                <strong>without</strong> <code class="inline">/v1</code>.
+                Use your gateway:
+                <code class="inline">http://localhost:8000</code> (local) or
+                <code class="inline">https://moderation.example.com</code> (your deploy) —
+                <strong>without</strong> trailing <code class="inline">/v1</code>.
                 sub2api appends <code class="inline">/v1/moderations</code>;
                 adding <code class="inline">/v1</code> yourself breaks the path.
               </p>
@@ -182,7 +183,7 @@ print(result.results[0].flagged)</pre>
               <p>
                 Use the gateway’s <code class="inline">MODERATION_API_KEY</code>,
                 <strong>not</strong> an Ollama Cloud key.
-                Public demo may need your own deploy key.
+                Use the key you set on your own deploy.
               </p>
             </div>
           </div>
@@ -191,7 +192,7 @@ print(result.results[0].flagged)</pre>
             <div>
               <h3>Set <code class="inline">timeout_ms</code> to <code class="inline">30000</code></h3>
               <p>
-                Default <code class="inline">3000</code> is too short for cloud LLMs and free-tier cold starts.
+                Default <code class="inline">3000</code> is too short for cloud LLMs.
               </p>
             </div>
           </div>
@@ -208,8 +209,8 @@ print(result.results[0].flagged)</pre>
       <div class="wrap">
         <h2 class="section-title">Deploy it for real</h2>
         <p class="section-lead">
-          Docker Compose for a single host. Helm on Kubernetes for production.
-          The Render URL is a demo — it cold-starts and is not the production path.
+          Primary path: <code class="inline">pip install</code>, Docker Compose, or Helm.
+          An optional Render demo may sleep / cold-start — do not rely on it.
         </p>
 
         <div class="grid-3">
@@ -225,8 +226,8 @@ print(result.results[0].flagged)</pre>
           </article>
           <article class="card">
             <div class="icon" aria-hidden="true">☁</div>
-            <h3>Render is a demo</h3>
-            <p>The onrender.com site is for poking the API. Free-tier cold starts. Use Helm (example host <code class="inline">moderation.example.com</code>) when it matters.</p>
+            <h3>Optional demo</h3>
+            <p>onrender.com may exist for poking the API but often sleeps / times out. Prefer local or Helm (example host <code class="inline">moderation.example.com</code>).</p>
           </article>
         </div>
 
@@ -331,18 +332,20 @@ docker compose up --build</pre>
     <section id="code">
       <div class="wrap">
         <h2 class="section-title">Get running in minutes</h2>
-        <p class="section-lead">Placeholder keys are for local smoke only. Never commit real secrets. Production: <a href="#deploy">Helm on Kubernetes</a>.</p>
+        <p class="section-lead"><code class="inline">pip install ollama-moderation-gateway</code> first. Placeholder keys are for local smoke only. Production: <a href="#deploy">Helm</a>.</p>
         <div class="split">
           <div>
-            <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">Local</h3>
-            <pre class="code-block">git clone https://github.com/AaronYang0628/ollama-moderation-gateway.git
-cd ollama-moderation-gateway
-python -m venv .venv &amp;&amp; source .venv/bin/activate
-pip install -e ".[dev]"
-cp .env.example .env
+            <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">pip (PyPI)</h3>
+            <pre class="code-block">pip install ollama-moderation-gateway
 export APP_ENV=development
 export MODERATION_API_KEY=local-moderation-key
-uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
+# Cloud: export OLLAMA_API_KEYS=...
+# Self-host: export OLLAMA_BASE_URL=http://127.0.0.1:11434
+ollama-moderation-gateway</pre>
+            <p style="margin: 0.75rem 0 0; color: var(--muted); font-size: 0.88rem;">
+              From source: <code class="inline">pip install -e ".[dev]"</code> then
+              <code class="inline">uvicorn app.main:app --host 0.0.0.0 --port 8000</code>.
+            </p>
           </div>
           <div>
             <h3 style="margin: 0 0 0.65rem; font-size: 1rem;">curl</h3>
@@ -354,8 +357,9 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
     "input": "Text to screen"
   }'</pre>
             <p style="margin: 1rem 0 0; color: var(--muted); font-size: 0.92rem;">
-              Demo: <a href="https://ollama-moderation-gateway.onrender.com">onrender.com</a> —
-              free tier may cold-start; demo only. Production host example:
+              Primary: local curl above. Optional demo
+              <a href="https://ollama-moderation-gateway.onrender.com">onrender.com</a>
+              may sleep / cold-start. Production example:
               <code class="inline">moderation.example.com</code> — see <a href="#deploy">Deploy</a>.
             </p>
           </div>
@@ -380,10 +384,11 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
       <div class="wrap">
         <div class="cta-band">
           <h2>Free Ollama moderation, ready to plug in</h2>
-          <p>Helm it onto Kubernetes, point sub2api or your SDK at it, rotate keys — or poke the live demo first.</p>
+          <p>pip install, Compose, or Helm — then point sub2api or your SDK at it.</p>
           <div class="cta-row" style="justify-content: center;">
             <a class="btn btn-primary" href="https://github.com/AaronYang0628/ollama-moderation-gateway">Star / fork on GitHub</a>
-            <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">Read the README</a>
+            <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">Quick start</a>
+            <a class="btn btn-ghost" href="https://github.com/AaronYang0628/ollama-moderation-gateway/blob/main/docs/PROMOTE.md">Share templates</a>
           </div>
         </div>
       </div>
@@ -400,7 +405,9 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
         ·
         <a href="https://github.com/AaronYang0628/ollama-moderation-gateway">GitHub</a>
         ·
-        <a href="https://ollama-moderation-gateway.onrender.com">Demo</a>
+        <a href="https://github.com/AaronYang0628/ollama-moderation-gateway#quick-start">Quick start</a>
+        ·
+        <a href="https://ollama-moderation-gateway.onrender.com" title="May sleep">Optional demo</a>
         ·
         <a href="https://github.com/AaronYang0628/ollama-moderation-gateway/blob/main/LICENSE">License</a>
       </div>
